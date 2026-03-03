@@ -1,0 +1,12 @@
+services:
+  - type: web
+    name: screener-pro
+    env: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn app:app --bind 0.0.0.0:$PORT --workers 2 --timeout 120
+    envVars:
+      - key: ALPHA_VANTAGE_KEY
+        sync: false          # You'll paste this in the Render dashboard
+      - key: PYTHON_VERSION
+        value: 3.11.0
+    autoDeploy: true         # Auto-redeploy when you push to GitHub
