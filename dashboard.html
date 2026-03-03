@@ -1,96 +1,741 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
-<html>
+<!DOCTYPE html>
+<html lang="en">
 <head>
-  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-  <meta http-equiv="Content-Style-Type" content="text/css">
-  <title></title>
-  <meta name="Generator" content="Cocoa HTML Writer">
-  <meta name="CocoaVersion" content="2575.7">
-  <style type="text/css">
-    body {background-color: #f1f4f7}
-    p.p1 {margin: 0.0px 0.0px 0.0px 0.0px; font: 20.0px 'Helvetica Neue'; color: #141926; -webkit-text-stroke: #141926}
-    p.p2 {margin: 0.0px 0.0px 0.0px 0.0px; font: 11.0px 'Helvetica Neue'; color: #67778f; -webkit-text-stroke: #67778f}
-    p.p3 {margin: 0.0px 0.0px 0.0px 0.0px; text-align: center; font: 12.0px 'Helvetica Neue'; color: #67778f; -webkit-text-stroke: #67778f}
-    p.p4 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px 'Helvetica Neue'; color: #67778f; -webkit-text-stroke: #67778f; background-color: #ffffff}
-    p.p5 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px 'Helvetica Neue'; color: #141926; -webkit-text-stroke: #141926; background-color: #dee2eb; min-height: 15.0px}
-    p.p6 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px 'Helvetica Neue'; color: #67778f; -webkit-text-stroke: #67778f; background-color: #a1aebd; min-height: 15.0px}
-    p.p7 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px 'Helvetica Neue'; color: #67778f; -webkit-text-stroke: #67778f}
-    p.p8 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px 'Helvetica Neue'; color: #c6cddc; -webkit-text-stroke: #c6cddc; background-color: #ffffff}
-    p.p9 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px 'Helvetica Neue'; color: #c6cddc; -webkit-text-stroke: #c6cddc; min-height: 15.0px}
-    p.p10 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px 'Helvetica Neue'; color: #141926; -webkit-text-stroke: #141926}
-    p.p11 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px 'Helvetica Neue'; color: #c6cddc; -webkit-text-stroke: #c6cddc}
-    p.p12 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px 'Helvetica Neue'; color: #e0840d; -webkit-text-stroke: #e0840d}
-    p.p13 {margin: 0.0px 0.0px 0.0px 0.0px; font: 10.0px 'Helvetica Neue'; color: #1650ff; -webkit-text-stroke: #1650ff; background-color: #eaf0ff}
-    p.p14 {margin: 0.0px 0.0px 0.0px 0.0px; font: 11.0px 'Helvetica Neue'; color: #a1aebd; -webkit-text-stroke: #a1aebd}
-    p.p15 {margin: 0.0px 0.0px 0.0px 0.0px; font: 10.0px 'Helvetica Neue'; color: #a1aebd; -webkit-text-stroke: #a1aebd}
-    p.p16 {margin: 0.0px 0.0px 0.0px 0.0px; text-align: right; font: 10.0px 'Helvetica Neue'; color: #a1aebd; -webkit-text-stroke: #a1aebd}
-    p.p17 {margin: 0.0px 0.0px 0.0px 0.0px; font: 14.0px 'Helvetica Neue'; color: #141926; -webkit-text-stroke: #141926; min-height: 17.0px}
-    p.p18 {margin: 0.0px 0.0px 0.0px 0.0px; font: 13.0px 'Helvetica Neue'; color: #67778f; -webkit-text-stroke: #67778f}
-    p.p19 {margin: 0.0px 0.0px 0.0px 0.0px; font: 10.0px 'Helvetica Neue'; color: #bc730c; -webkit-text-stroke: #bc730c; background-color: #fff7e7}
-    p.p20 {margin: 0.0px 0.0px 0.0px 0.0px; text-align: center; font: 11.0px 'Helvetica Neue'; color: #a1aebd; -webkit-text-stroke: #a1aebd}
-    p.p21 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px 'Helvetica Neue'; color: #ffffff; -webkit-text-stroke: #ffffff; background-color: #1650ff}
-    span.s1 {font-kerning: none}
-    span.s2 {font-kerning: none; color: #1650ff; -webkit-text-stroke: 0px #1650ff}
-    span.s3 {font-kerning: none; background-color: #ffffff}
-    span.s4 {font-kerning: none; color: #141926; -webkit-text-stroke: 0px #141926}
-    span.s5 {font: 12.0px '.Apple Color Emoji UI'; font-kerning: none; background-color: #fff7e7}
-    span.s6 {font-kerning: none; background-color: #fff7e7}
-    span.s7 {font: 13.0px '.Apple Color Emoji UI'; font-kerning: none; color: #67778f; -webkit-text-stroke: 0px #67778f}
-    span.s8 {font: 13.0px 'Helvetica Neue'; font-kerning: none; color: #67778f; -webkit-text-stroke: 0px #67778f}
-    span.s9 {font-kerning: none; background-color: #f6f9fb}
-    span.s10 {font: 13.0px '.Apple Color Emoji UI'; font-kerning: none}
-    span.s11 {font: 12.0px '.Apple Color Emoji UI'; font-kerning: none}
-    span.s12 {font: 12.0px 'Helvetica Neue'; font-kerning: none}
-    span.s13 {font: 14.0px 'Helvetica Neue'; font-kerning: none; color: #141926; background-color: rgba(255, 255, 255, 0.92); -webkit-text-stroke: 0px #141926}
-    span.s14 {font: 12.0px '.Apple Color Emoji UI'; font-kerning: none; color: #67778f; background-color: #ffffff; -webkit-text-stroke: 0px #67778f}
-    span.s15 {font: 12.0px 'Helvetica Neue'; font-kerning: none; color: #67778f; background-color: #ffffff; -webkit-text-stroke: 0px #67778f}
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Screener Pro — Daily Top Picks</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:         #f4f6f9;
+  --surface:    #ffffff;
+  --border:     #e4e8ef;
+  --border2:    #d0d7e3;
+  --text:       #1a2233;
+  --muted:      #7a8aa0;
+  --faint:      #b0bcc9;
+  --accent:     #1a6cff;
+  --accent-bg:  #eef3ff;
+  --green:      #0db07d;
+  --green-bg:   #edfaf5;
+  --red:        #e8364a;
+  --red-bg:     #fef0f2;
+  --yellow:     #e8960a;
+  --yellow-bg:  #fff8ec;
+  --gold:       #c9860a;
+  --sans:       'DM Sans', sans-serif;
+  --mono:       'DM Mono', monospace;
+  --radius:     12px;
+  --shadow:     0 1px 3px rgba(0,0,0,0.06), 0 4px 16px rgba(0,0,0,0.04);
+  --shadow-hover: 0 2px 8px rgba(0,0,0,0.08), 0 8px 24px rgba(0,0,0,0.07);
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--sans);
+  font-size: 14px;
+  min-height: 100vh;
+}
+
+/* subtle dot grid */
+body::before {
+  content: '';
+  position: fixed; inset: 0;
+  background-image: radial-gradient(circle, #c8d0dc 1px, transparent 1px);
+  background-size: 28px 28px;
+  opacity: 0.45;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.wrap { position: relative; z-index: 1; max-width: 860px; margin: 0 auto; padding: 0 16px 60px; }
+
+/* ── HEADER ── */
+header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 22px 0 20px;
+  flex-wrap: wrap; gap: 12px;
+}
+
+.brand {
+  display: flex; align-items: baseline; gap: 8px;
+}
+.brand-name {
+  font-size: 20px; font-weight: 700; letter-spacing: -0.5px;
+  color: var(--text);
+}
+.brand-name span { color: var(--accent); }
+.brand-date {
+  font-family: var(--mono); font-size: 11px;
+  color: var(--muted); letter-spacing: 0.3px;
+}
+
+.header-right { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+
+/* live toggle */
+.live-toggle {
+  display: flex; align-items: center; gap: 8px;
+  background: var(--surface); border: 1.5px solid var(--border2);
+  border-radius: 20px; padding: 5px 5px 5px 12px;
+  cursor: pointer; user-select: none;
+  font-size: 12px; font-weight: 500;
+  transition: all 0.2s;
+}
+.live-toggle:hover { border-color: var(--accent); }
+.live-toggle.live { border-color: var(--green); background: var(--green-bg); color: var(--green); }
+.toggle-pill {
+  width: 36px; height: 22px; border-radius: 11px;
+  background: var(--border); position: relative;
+  transition: background 0.2s;
+}
+.live-toggle.live .toggle-pill { background: var(--green); }
+.toggle-pill::after {
+  content: ''; position: absolute;
+  top: 3px; left: 3px;
+  width: 16px; height: 16px; border-radius: 50%;
+  background: white;
+  transition: transform 0.2s;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+}
+.live-toggle.live .toggle-pill::after { transform: translateX(14px); }
+
+/* refresh button */
+.btn-refresh {
+  background: var(--surface); border: 1.5px solid var(--border2);
+  border-radius: 8px; padding: 7px 14px;
+  font-family: var(--sans); font-size: 12px; font-weight: 500;
+  color: var(--muted); cursor: pointer;
+  transition: all 0.2s; display: flex; align-items: center; gap: 6px;
+}
+.btn-refresh:hover { border-color: var(--accent); color: var(--accent); }
+.btn-refresh.spinning .refresh-icon { animation: spin 0.7s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* market status bar */
+.market-bar {
+  display: flex; align-items: center; gap: 16px;
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 10px 16px;
+  margin-bottom: 24px;
+  font-size: 12px; color: var(--muted);
+  flex-wrap: wrap;
+  box-shadow: var(--shadow);
+  animation: slideDown 0.4s ease both;
+}
+.market-stat { display: flex; align-items: center; gap: 6px; }
+.market-stat strong { color: var(--text); font-weight: 600; }
+.dot { width: 7px; height: 7px; border-radius: 50%; background: var(--faint); }
+.dot.open { background: var(--green); box-shadow: 0 0 5px rgba(13,176,125,0.4); animation: blink 2s infinite; }
+.dot.closed { background: var(--red); }
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.4} }
+.bar-sep { color: var(--border2); }
+
+/* ── SECTION TITLES ── */
+.section-head {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 10px;
+}
+.section-title {
+  font-size: 13px; font-weight: 600; letter-spacing: 0.4px;
+  text-transform: uppercase; color: var(--muted);
+  display: flex; align-items: center; gap: 8px;
+}
+.section-title .pill {
+  font-size: 10px; padding: 2px 8px; border-radius: 20px;
+  font-weight: 600; letter-spacing: 0.3px;
+}
+.pill-stock { background: var(--accent-bg); color: var(--accent); }
+.pill-crypto { background: var(--yellow-bg); color: var(--gold); }
+.section-meta { font-size: 11px; color: var(--faint); font-family: var(--mono); }
+
+/* ── STOCK TABLE ── */
+.ticker-table {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+  box-shadow: var(--shadow);
+  margin-bottom: 28px;
+}
+
+.table-header {
+  display: grid;
+  grid-template-columns: 28px 1fr 90px 90px 130px 90px;
+  gap: 0;
+  padding: 9px 16px;
+  border-bottom: 1px solid var(--border);
+  background: #f8fafc;
+}
+.th {
+  font-size: 10px; font-weight: 600; letter-spacing: 0.6px;
+  text-transform: uppercase; color: var(--faint);
+}
+.th.right { text-align: right; }
+.th.center { text-align: center; }
+
+.ticker-row {
+  display: grid;
+  grid-template-columns: 28px 1fr 90px 90px 130px 90px;
+  gap: 0;
+  padding: 13px 16px;
+  border-bottom: 1px solid var(--border);
+  align-items: center;
+  cursor: pointer;
+  transition: background 0.15s;
+  animation: rowIn 0.35s ease both;
+}
+.ticker-row:last-child { border-bottom: none; }
+.ticker-row:hover { background: #f8fafc; }
+@keyframes rowIn {
+  from { opacity: 0; transform: translateX(-8px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+.ticker-row:nth-child(1) { animation-delay: 0.05s; }
+.ticker-row:nth-child(2) { animation-delay: 0.10s; }
+.ticker-row:nth-child(3) { animation-delay: 0.15s; }
+.ticker-row:nth-child(4) { animation-delay: 0.20s; }
+.ticker-row:nth-child(5) { animation-delay: 0.25s; }
+
+/* rank badge */
+.rank {
+  font-family: var(--mono); font-size: 11px; font-weight: 500;
+  color: var(--faint); text-align: center;
+}
+.rank.top { color: var(--gold); }
+
+/* ticker name */
+.ticker-info {}
+.ticker-symbol {
+  font-weight: 700; font-size: 14px; letter-spacing: -0.2px;
+  color: var(--text);
+}
+.ticker-name {
+  font-size: 11px; color: var(--muted); margin-top: 1px;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 140px;
+}
+
+/* price */
+.price-cell { text-align: right; }
+.price-val {
+  font-family: var(--mono); font-weight: 500; font-size: 14px;
+}
+.price-sub { font-size: 10px; color: var(--faint); margin-top: 1px; font-family: var(--mono); }
+
+/* change */
+.change-cell { text-align: right; }
+.change-badge {
+  display: inline-flex; align-items: center; gap: 3px;
+  padding: 3px 8px; border-radius: 6px;
+  font-family: var(--mono); font-size: 12px; font-weight: 500;
+}
+.change-badge.up   { background: var(--green-bg); color: var(--green); }
+.change-badge.down { background: var(--red-bg);   color: var(--red);   }
+.change-badge.flat { background: #f0f2f5;          color: var(--muted); }
+
+/* signal score bar */
+.score-cell {}
+.score-label {
+  display: flex; justify-content: space-between;
+  font-size: 10px; margin-bottom: 4px;
+}
+.score-label span { color: var(--muted); }
+.score-label strong { font-family: var(--mono); font-weight: 600; }
+.score-track {
+  height: 5px; background: var(--border);
+  border-radius: 3px; overflow: hidden;
+}
+.score-fill {
+  height: 100%; border-radius: 3px;
+  transition: width 0.8s cubic-bezier(0.16,1,0.3,1);
+}
+.score-fill.high   { background: linear-gradient(90deg, #0db07d, #00d4a0); }
+.score-fill.medium { background: linear-gradient(90deg, #e8960a, #f5b429); }
+.score-fill.low    { background: linear-gradient(90deg, #e8364a, #f0607a); }
+
+/* signal strength badge */
+.signal-cell { text-align: right; }
+.signal-badge {
+  display: inline-flex; align-items: center; gap: 5px;
+  padding: 4px 10px; border-radius: 7px;
+  font-size: 11px; font-weight: 600; letter-spacing: 0.2px;
+}
+.signal-badge.strong-buy  { background: #e8faf4; color: #0a8f63; border: 1px solid #b8edda; }
+.signal-badge.buy         { background: var(--green-bg); color: var(--green); border: 1px solid #c5f0e0; }
+.signal-badge.neutral     { background: #f0f2f5; color: var(--muted); border: 1px solid var(--border); }
+.signal-badge.sell        { background: var(--red-bg); color: var(--red); border: 1px solid #fac8ce; }
+.signal-badge .sig-dot {
+  width: 5px; height: 5px; border-radius: 50%;
+}
+.strong-buy .sig-dot  { background: #0a8f63; }
+.buy .sig-dot         { background: var(--green); }
+.neutral .sig-dot     { background: var(--muted); }
+.sell .sig-dot        { background: var(--red); }
+
+/* expanded signal breakdown */
+.signal-breakdown {
+  display: none;
+  grid-column: 1 / -1;
+  background: #f8fafd;
+  border-top: 1px solid var(--border);
+  padding: 14px 16px;
+  animation: expandIn 0.2s ease;
+}
+@keyframes expandIn { from { opacity:0; transform:translateY(-4px); } to { opacity:1; transform:translateY(0); } }
+.signal-breakdown.open { display: block; }
+.signals-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 10px;
+}
+.sig-item { }
+.sig-name { font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.4px; margin-bottom: 4px; }
+.sig-track { height: 4px; background: var(--border); border-radius: 2px; overflow: hidden; }
+.sig-bar { height: 100%; border-radius: 2px; background: var(--accent); }
+.sig-val { font-family: var(--mono); font-size: 11px; color: var(--text); margin-top: 3px; font-weight: 500; }
+
+/* ── LOADING STATE ── */
+.skeleton {
+  background: linear-gradient(90deg, #eef1f6 25%, #f4f6fa 50%, #eef1f6 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.4s infinite;
+  border-radius: 4px;
+}
+@keyframes shimmer { to { background-position: -200% 0; } }
+
+/* ── LIVE MODE BANNER ── */
+.live-banner {
+  display: none;
+  align-items: center; gap: 10px;
+  background: var(--green-bg); border: 1px solid #b8edda;
+  border-radius: var(--radius); padding: 10px 16px;
+  margin-bottom: 16px; font-size: 12px; color: var(--green); font-weight: 500;
+}
+.live-banner.show { display: flex; }
+
+/* ── DEMO BANNER ── */
+.demo-banner {
+  display: flex; align-items: center; gap: 10px;
+  background: var(--yellow-bg); border: 1px solid #fbd79a;
+  border-radius: var(--radius); padding: 10px 16px;
+  margin-bottom: 20px; font-size: 12px; color: var(--yellow); font-weight: 500;
+}
+.demo-banner.hide { display: none; }
+
+/* ── LAST UPDATED ── */
+.last-updated {
+  text-align: center; font-size: 11px; color: var(--faint);
+  font-family: var(--mono); margin-top: 20px;
+}
+
+/* ── NAV ── */
+.bottom-nav {
+  position: fixed; bottom: 0; left: 0; right: 0;
+  background: rgba(255,255,255,0.92);
+  backdrop-filter: blur(12px);
+  border-top: 1px solid var(--border);
+  display: flex; justify-content: center; gap: 8px;
+  padding: 10px 16px;
+  z-index: 100;
+}
+.nav-btn {
+  font-family: var(--sans); font-size: 12px; font-weight: 500;
+  padding: 8px 18px; border-radius: 8px;
+  border: 1.5px solid var(--border2); background: var(--surface);
+  color: var(--muted); cursor: pointer; transition: all 0.2s;
+  text-decoration: none; display: inline-flex; align-items: center; gap: 6px;
+}
+.nav-btn:hover { border-color: var(--accent); color: var(--accent); }
+.nav-btn.active { background: var(--accent); border-color: var(--accent); color: white; }
+
+/* mobile */
+@media (max-width: 620px) {
+  .table-header,
+  .ticker-row {
+    grid-template-columns: 24px 1fr 70px 80px;
+  }
+  .th.hide-mobile, .td-hide { display: none; }
+  .score-cell { display: none; }
+  .ticker-name { max-width: 100px; }
+}
+
+@keyframes slideDown {
+  from { opacity:0; transform:translateY(-6px); }
+  to   { opacity:1; transform:translateY(0); }
+}
+</style>
 </head>
 <body>
-<p class="p1"><span class="s1">https://screener-pro-56im.onrender.com/api/screening_results.json</span></p>
-<p class="p1"><span class="s1">SCREENER </span><span class="s2">PRO</span></p>
-<p class="p2"><span class="s1">—</span></p>
-<p class="p3"><span class="s3">↻</span></p>
-<p class="p4"><span class="s1">Refresh </span><span class="s4">DEMO</span></p>
-<p class="p5"><span class="s1"></span><br></p>
-<p class="p6"><span class="s1"></span><br></p>
-<p class="p7"><span class="s3">—</span></p>
-<p class="p8"><span class="s1">·https://screener-pro-56im.onrender.com/api/screening_results.json</span></p>
-<p class="p9"><span class="s1"></span><br></p>
-<p class="p7"><span class="s3">S&amp;P 500</span></p>
-<p class="p10"><span class="s3">—</span></p>
-<p class="p11"><span class="s3">·</span></p>
-<p class="p7"><span class="s3">NASDAQ</span></p>
-<p class="p10"><span class="s3">—</span></p>
-<p class="p11"><span class="s3">·</span></p>
-<p class="p7"><span class="s3">BTC</span></p>
-<p class="p10"><span class="s3">—</span></p>
-<p class="p11"><span class="s3">·</span></p>
-<p class="p7"><span class="s3">Screened</span></p>
-<p class="p10"><span class="s3">—</span></p>
-<p class="p12"><span class="s5">⚡</span><span class="s6"> Demo mode — showing simulated data. Toggle</span></p>
-<p class="p12"><span class="s6">LIVE</span></p>
-<p class="p12"><span class="s6">to connect to real market data via Python backend. </span><span class="s7">📈</span><span class="s8"> TOP STOCKS</span></p>
-<p class="p13"><span class="s1">≤ $20 · TODAY</span></p>
-<p class="p14"><span class="s1">Ranked by composite score</span></p>
-<p class="p15"><span class="s9">#</span></p>
-<p class="p15"><span class="s9">TICKER</span></p>
-<p class="p16"><span class="s9">PRICE</span></p>
-<p class="p16"><span class="s9">CHANGE</span></p>
-<p class="p15"><span class="s9">SCORE</span></p>
-<p class="p16"><span class="s9">SIGNAL</span></p>
-<p class="p17"><span class="s1"></span><br></p>
-<p class="p18"><span class="s10">🪙</span><span class="s1"> TOP CRYPTOS</span></p>
-<p class="p19"><span class="s1">≤ $20 · TODAY</span></p>
-<p class="p14"><span class="s1">Ranked by composite score</span></p>
-<p class="p15"><span class="s9">#</span></p>
-<p class="p15"><span class="s9">COIN</span></p>
-<p class="p16"><span class="s9">PRICE</span></p>
-<p class="p16"><span class="s9">CHANGE</span></p>
-<p class="p15"><span class="s9">SCORE</span></p>
-<p class="p16"><span class="s9">SIGNAL</span></p>
-<p class="p17"><span class="s1"></span><br></p>
-<p class="p20"><span class="s1">—</span></p>
-<p class="p21"><span class="s11"><a href="file:///Users/jakehagen/Downloads/files/dashboard.html">📊<span class="s12"> Screener</span></a></span><span class="s13"> <a href="file:///Users/jakehagen/Downloads/files/config_editor.html"><span class="s14">⚙️</span><span class="s15"> Config</span></a></span></p>
+<div class="wrap">
+
+  <!-- Header -->
+  <header>
+    <div class="brand">
+      <div class="brand-name">SCREENER <span>PRO</span></div>
+      <div class="brand-date" id="today-date">—</div>
+    </div>
+    <div class="header-right">
+      <button class="btn-refresh" id="refresh-btn" onclick="refresh()">
+        <span class="refresh-icon">↻</span> Refresh
+      </button>
+      <div class="live-toggle" id="live-toggle" onclick="toggleLive()">
+        DEMO
+        <div class="toggle-pill"></div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Market status bar -->
+  <div class="market-bar">
+    <div class="market-stat">
+      <div class="dot" id="market-dot"></div>
+      <span id="market-status">—</span>
+    </div>
+    <span class="bar-sep">·</span>
+    <div class="market-stat"><span>S&P 500</span> <strong id="spx">—</strong></div>
+    <span class="bar-sep">·</span>
+    <div class="market-stat"><span>NASDAQ</span> <strong id="ndx">—</strong></div>
+    <span class="bar-sep">·</span>
+    <div class="market-stat"><span>BTC</span> <strong id="btc-price">—</strong></div>
+    <span class="bar-sep">·</span>
+    <div class="market-stat"><span>Screened</span> <strong id="scanned-count">—</strong></div>
+  </div>
+
+  <!-- Demo banner -->
+  <div class="demo-banner" id="demo-banner">
+    ⚡ Demo mode — showing simulated data. Toggle <strong>LIVE</strong> to connect to real market data via Python backend.
+  </div>
+  <div class="live-banner" id="live-banner">
+    <span>●</span> Live data — pulling from Yahoo Finance + CoinGecko. Last scan: <span id="live-scan-time">—</span>
+  </div>
+
+  <!-- ── STOCKS ── -->
+  <div class="section-head">
+    <div class="section-title">
+      📈 Top Stocks
+      <span class="pill pill-stock">≤ $20 · TODAY</span>
+    </div>
+    <div class="section-meta" id="stock-meta">Ranked by composite score</div>
+  </div>
+
+  <div class="ticker-table" id="stock-table">
+    <div class="table-header">
+      <div class="th">#</div>
+      <div class="th">Ticker</div>
+      <div class="th right">Price</div>
+      <div class="th right">Change</div>
+      <div class="th">Score</div>
+      <div class="th right">Signal</div>
+    </div>
+    <div id="stock-rows"></div>
+  </div>
+
+  <!-- ── CRYPTO ── -->
+  <div class="section-head">
+    <div class="section-title">
+      🪙 Top Cryptos
+      <span class="pill pill-crypto">≤ $20 · TODAY</span>
+    </div>
+    <div class="section-meta" id="crypto-meta">Ranked by composite score</div>
+  </div>
+
+  <div class="ticker-table" id="crypto-table">
+    <div class="table-header">
+      <div class="th">#</div>
+      <div class="th">Coin</div>
+      <div class="th right">Price</div>
+      <div class="th right">Change</div>
+      <div class="th">Score</div>
+      <div class="th right">Signal</div>
+    </div>
+    <div id="crypto-rows"></div>
+  </div>
+
+  <div class="last-updated" id="last-updated">—</div>
+</div>
+
+<!-- Bottom nav -->
+<div class="bottom-nav">
+  <a class="nav-btn active" href="dashboard.html">📊 Screener</a>
+  <a class="nav-btn" href="config_editor.html">⚙️ Config</a>
+</div>
+
+<script>
+// ── State ──
+let isLive = false;
+let autoTimer = null;
+
+// ── Demo data (simulated with realistic signals) ──
+const DEMO_STOCKS = [
+  { rank:1, symbol:"PLUG",  name:"Plug Power Inc",       price:3.18,  change:+8.4,  score:82, rvol:9.2, momentum:8.8, vwap:8.5, breakout:8.1, atr:8.7, rsi:7.2, adx:6.8, gap:7.5, liquidity:6.0, catalyst:5.0 },
+  { rank:2, symbol:"SNDL",  name:"SNDL Inc",             price:1.44,  change:+6.1,  score:76, rvol:8.7, momentum:7.9, vwap:7.3, breakout:7.8, atr:8.2, rsi:6.9, adx:6.1, gap:5.5, liquidity:5.5, catalyst:4.0 },
+  { rank:3, symbol:"FCEL",  name:"FuelCell Energy",      price:2.87,  change:+4.9,  score:71, rvol:7.5, momentum:7.2, vwap:6.8, breakout:7.1, atr:7.4, rsi:7.5, adx:6.5, gap:4.2, liquidity:5.0, catalyst:6.0 },
+  { rank:4, symbol:"BLNK",  name:"Blink Charging Co",   price:4.62,  change:+3.3,  score:64, rvol:6.8, momentum:6.4, vwap:6.2, breakout:6.5, atr:6.1, rsi:6.8, adx:5.8, gap:3.8, liquidity:6.5, catalyst:3.0 },
+  { rank:5, symbol:"GEVO",  name:"Gevo Inc",             price:1.93,  change:+2.1,  score:58, rvol:5.9, momentum:5.8, vwap:5.5, breakout:5.9, atr:5.7, rsi:6.2, adx:5.2, gap:3.1, liquidity:5.8, catalyst:2.0 },
+];
+
+const DEMO_CRYPTOS = [
+  { rank:1, symbol:"XRP",   name:"Ripple",               price:0.614, change:+11.2, score:88, volume_spike:9.5, momentum:9.1, breakout:8.8, volatility:8.2, liquidity:7.5 },
+  { rank:2, symbol:"ADA",   name:"Cardano",              price:0.488, change:+7.8,  score:79, volume_spike:8.4, momentum:8.0, breakout:7.9, volatility:7.1, liquidity:7.0 },
+  { rank:3, symbol:"DOGE",  name:"Dogecoin",             price:0.172, change:+5.4,  score:73, volume_spike:7.8, momentum:7.3, breakout:7.2, volatility:7.5, liquidity:8.0 },
+  { rank:4, symbol:"TRX",   name:"TRON",                 price:0.131, change:+3.1,  score:64, volume_spike:6.5, momentum:6.2, breakout:6.8, volatility:5.9, liquidity:6.8 },
+  { rank:5, symbol:"XLM",   name:"Stellar Lumens",       price:0.119, change:+1.8,  score:55, volume_spike:5.5, momentum:5.2, breakout:5.8, volatility:5.1, liquidity:6.2 },
+];
+
+// ── Helpers ──
+function fmtPrice(p) {
+  return p < 1 ? '$' + p.toFixed(4) : '$' + p.toFixed(2);
+}
+function fmtChange(c) {
+  const sign = c >= 0 ? '+' : '';
+  return sign + c.toFixed(2) + '%';
+}
+function signalLabel(score) {
+  if (score >= 80) return { cls: 'strong-buy', txt: 'Strong Buy' };
+  if (score >= 65) return { cls: 'buy',        txt: 'Buy' };
+  if (score >= 45) return { cls: 'neutral',    txt: 'Neutral' };
+  return               { cls: 'sell',          txt: 'Weak' };
+}
+function scoreClass(score) {
+  if (score >= 70) return 'high';
+  if (score >= 45) return 'medium';
+  return 'low';
+}
+function scoreColor(val) {
+  // 0-10 signal value → color
+  const pct = (val / 10) * 100;
+  if (pct >= 70) return '#0db07d';
+  if (pct >= 45) return '#e8960a';
+  return '#e8364a';
+}
+
+// ── Render a row ──
+function buildRow(item, type, idx) {
+  const isStock = type === 'stock';
+  const sig = signalLabel(item.score);
+  const chgCls = item.change > 0.5 ? 'up' : item.change < -0.5 ? 'down' : 'flat';
+  const arrow = item.change > 0.5 ? '▲' : item.change < -0.5 ? '▼' : '—';
+
+  // signals
+  const signals = isStock
+    ? [
+        { name:'RVOL',     val: item.rvol },
+        { name:'Momentum', val: item.momentum },
+        { name:'VWAP',     val: item.vwap },
+        { name:'Breakout', val: item.breakout },
+        { name:'ATR',      val: item.atr },
+        { name:'RSI',      val: item.rsi },
+        { name:'ADX',      val: item.adx },
+        { name:'Gap',      val: item.gap },
+        { name:'Liquidity',val: item.liquidity },
+        { name:'Catalyst', val: item.catalyst },
+      ]
+    : [
+        { name:'Vol Spike',val: item.volume_spike },
+        { name:'Momentum', val: item.momentum },
+        { name:'Breakout', val: item.breakout },
+        { name:'Volatility',val:item.volatility },
+        { name:'Liquidity',val: item.liquidity },
+      ];
+
+  const sigHtml = signals.map(s => `
+    <div class="sig-item">
+      <div class="sig-name">${s.name}</div>
+      <div class="sig-track"><div class="sig-bar" style="width:${(s.val/10)*100}%;background:${scoreColor(s.val)}"></div></div>
+      <div class="sig-val">${s.val.toFixed(1)}/10</div>
+    </div>`).join('');
+
+  const rowId = type + '-row-' + idx;
+  const bdId  = type + '-bd-' + idx;
+
+  return `
+    <div class="ticker-row" id="${rowId}" onclick="toggleBreakdown('${bdId}')">
+      <div class="rank ${item.rank <= 2 ? 'top' : ''}">${item.rank}</div>
+      <div class="ticker-info">
+        <div class="ticker-symbol">${item.symbol}</div>
+        <div class="ticker-name">${item.name}</div>
+      </div>
+      <div class="price-cell td-right">
+        <div class="price-val">${fmtPrice(item.price)}</div>
+      </div>
+      <div class="change-cell td-right">
+        <div class="change-badge ${chgCls}">${arrow} ${fmtChange(item.change)}</div>
+      </div>
+      <div class="score-cell">
+        <div class="score-label">
+          <span>Composite</span>
+          <strong>${item.score}</strong>
+        </div>
+        <div class="score-track">
+          <div class="score-fill ${scoreClass(item.score)}" style="width:${item.score}%"></div>
+        </div>
+      </div>
+      <div class="signal-cell">
+        <div class="signal-badge ${sig.cls}">
+          <div class="sig-dot"></div>${sig.txt}
+        </div>
+      </div>
+    </div>
+    <div class="signal-breakdown" id="${bdId}">
+      <div class="signals-grid">${sigHtml}</div>
+    </div>`;
+}
+
+function toggleBreakdown(id) {
+  const el = document.getElementById(id);
+  el.classList.toggle('open');
+}
+
+// ── Render tables ──
+function renderData(stocks, cryptos) {
+  document.getElementById('stock-rows').innerHTML  = stocks.map((s,i)  => buildRow(s,  'stock',  i)).join('');
+  document.getElementById('crypto-rows').innerHTML = cryptos.map((c,i) => buildRow(c,  'crypto', i)).join('');
+
+  const now = new Date();
+  document.getElementById('last-updated').textContent =
+    'Last updated: ' + now.toLocaleTimeString('en-US', {hour:'2-digit', minute:'2-digit', second:'2-digit'});
+  document.getElementById('stock-meta').textContent  = stocks.length  + ' stocks scanned · ranked by composite score';
+  document.getElementById('crypto-meta').textContent = cryptos.length + ' coins scanned · ranked by composite score';
+  document.getElementById('scanned-count').textContent = (stocks.length + cryptos.length) + ' assets';
+}
+
+// ── Skeleton loader ──
+function showSkeleton() {
+  const skRow = () => `
+    <div class="ticker-row" style="pointer-events:none">
+      <div class="rank"><div class="skeleton" style="width:14px;height:14px"></div></div>
+      <div class="ticker-info">
+        <div class="skeleton" style="width:50px;height:14px;margin-bottom:4px"></div>
+        <div class="skeleton" style="width:100px;height:10px"></div>
+      </div>
+      <div class="price-cell"><div class="skeleton" style="width:50px;height:14px;margin-left:auto"></div></div>
+      <div class="change-cell"><div class="skeleton" style="width:60px;height:22px;border-radius:6px;margin-left:auto"></div></div>
+      <div class="score-cell"><div class="skeleton" style="width:100%;height:5px;margin-top:10px"></div></div>
+      <div class="signal-cell"><div class="skeleton" style="width:70px;height:24px;border-radius:7px;margin-left:auto"></div></div>
+    </div>`;
+  const rows = Array(5).fill(0).map(skRow).join('');
+  document.getElementById('stock-rows').innerHTML  = rows;
+  document.getElementById('crypto-rows').innerHTML = rows;
+}
+
+// ── Live fetch (calls Python backend) ──
+async function fetchLive() {
+  try {
+    const res = await fetch('https://screener-pro-56im.onrender.com/api/screening_results.json');
+    if (!res.ok) throw new Error('Backend not reachable');
+    const data = await res.json();
+    renderData(data.stocks, data.cryptos);
+    document.getElementById('live-scan-time').textContent = new Date().toLocaleTimeString();
+  } catch(e) {
+    // Fallback to demo if backend unreachable
+    console.warn('Live fetch failed, using demo data:', e.message);
+    renderData(DEMO_STOCKS, DEMO_CRYPTOS);
+    showNotice('⚠ Could not reach backend — showing demo data');
+  }
+}
+
+// ── Toggle live/demo ──
+function toggleLive() {
+  isLive = !isLive;
+  const toggle = document.getElementById('live-toggle');
+  const demoBanner = document.getElementById('demo-banner');
+  const liveBanner = document.getElementById('live-banner');
+  if (isLive) {
+    toggle.classList.add('live');
+    toggle.childNodes[0].textContent = 'LIVE ';
+    demoBanner.classList.add('hide');
+    liveBanner.classList.add('show');
+    refresh();
+    // Auto-refresh every 5 min when live
+    if (autoTimer) clearInterval(autoTimer);
+    autoTimer = setInterval(refresh, 5 * 60 * 1000);
+  } else {
+    toggle.classList.remove('live');
+    toggle.childNodes[0].textContent = 'DEMO';
+    demoBanner.classList.remove('hide');
+    liveBanner.classList.remove('show');
+    if (autoTimer) { clearInterval(autoTimer); autoTimer = null; }
+    renderData(DEMO_STOCKS, DEMO_CRYPTOS);
+  }
+}
+
+// ── Refresh ──
+async function refresh() {
+  const btn = document.getElementById('refresh-btn');
+  btn.classList.add('spinning');
+  showSkeleton();
+  await new Promise(r => setTimeout(r, isLive ? 800 : 600));
+  if (isLive) {
+    await fetchLive();
+  } else {
+    // Slightly randomize demo scores to simulate refresh
+    const jitter = arr => arr.map(item => ({
+      ...item,
+      change: +(item.change + (Math.random()-0.5)*0.4).toFixed(2),
+      score:  Math.min(99, Math.max(30, item.score + Math.round((Math.random()-0.5)*3)))
+    }));
+    renderData(jitter(DEMO_STOCKS), jitter(DEMO_CRYPTOS));
+  }
+  btn.classList.remove('spinning');
+}
+
+// ── Market status ──
+function updateMarketStatus() {
+  const now = new Date();
+  const et = new Date(now.toLocaleString('en-US', {timeZone:'America/New_York'}));
+  const h = et.getHours(), m = et.getMinutes(), day = et.getDay();
+  const dot = document.getElementById('market-dot');
+  const status = document.getElementById('market-status');
+  const mins = h * 60 + m;
+  const isWeekday = day >= 1 && day <= 5;
+  if (isWeekday && mins >= 9*60+30 && mins < 16*60) {
+    dot.classList.add('open'); dot.classList.remove('closed');
+    status.innerHTML = '<strong>Market Open</strong>';
+  } else if (isWeekday && mins >= 4*60 && mins < 9*60+30) {
+    dot.classList.remove('open'); dot.classList.add('closed');
+    status.innerHTML = 'Pre-Market';
+  } else if (isWeekday && mins >= 16*60 && mins < 20*60) {
+    dot.classList.remove('open'); dot.classList.add('closed');
+    status.innerHTML = 'After-Hours';
+  } else {
+    dot.classList.remove('open'); dot.classList.add('closed');
+    status.innerHTML = 'Market Closed';
+  }
+}
+
+function showNotice(msg) {
+  // brief inline notice
+  const n = document.createElement('div');
+  n.style.cssText = 'position:fixed;top:16px;left:50%;transform:translateX(-50%);background:#fff3cd;border:1px solid #fbd79a;border-radius:8px;padding:8px 16px;font-size:12px;color:#856404;z-index:999;box-shadow:0 2px 8px rgba(0,0,0,0.1)';
+  n.textContent = msg;
+  document.body.appendChild(n);
+  setTimeout(() => n.remove(), 3500);
+}
+
+// ── Demo market data ──
+function populateMarketBar() {
+  document.getElementById('spx').textContent    = '5,612.34';
+  document.getElementById('ndx').textContent    = '17,891.22';
+  document.getElementById('btc-price').textContent = '$84,210';
+  document.getElementById('scanned-count').textContent = '110 assets';
+}
+
+// ── Init ──
+function init() {
+  // Date
+  const d = new Date();
+  document.getElementById('today-date').textContent =
+    d.toLocaleDateString('en-US', {weekday:'short', month:'short', day:'numeric', year:'numeric'});
+
+  updateMarketStatus();
+  setInterval(updateMarketStatus, 60000);
+  populateMarketBar();
+  renderData(DEMO_STOCKS, DEMO_CRYPTOS);
+}
+
+init();
+</script>
 </body>
 </html>
