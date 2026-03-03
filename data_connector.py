@@ -6,7 +6,6 @@
 import time
 import logging
 import requests
-import pandas as pd
 import yfinance as yf
 from datetime import datetime, timedelta
 from typing import Optional
@@ -66,69 +65,63 @@ class StockConnector:
             tk   = yf.Ticker(symbol)
             info = tk.info
 
-            # Validate essential fields
             price = info.get('currentPrice') or info.get('regularMarketPrice')
             if not price:
                 return None
 
-            hist = tk.history(period='60d', interval='1d')
-            if hist.empty or len(hist) < 10:
+            # Get history as dict of lists (no pandas needed)
+            hist    = tk.history(period='60d', interval='1d')
+            if hist is None or len(hist) < 10:
                 return None
 
-            hist_5m = tk.history(period='2d', interval='5m')
+            closes  = list(hist['Close'])
+            volumes = list(hist['Volume'])
+            highs   = list(hist['High'])
+            lows    = list(hist['Low'])
 
-            close   = hist['Close']
-            volume  = hist['Volume']
-            high    = hist['High']
-            low     = hist['Low']
-
-            avg_vol_20 = volume.tail(20).mean()
-            today_vol  = volume.iloc[-1]
+            today_vol  = volumes[-1]
+            avg_vol_20 = sum(volumes[-20:]) / min(20, len(volumes))
             rvol       = today_vol / avg_vol_20 if avg_vol_20 > 0 else 1.0
 
-            prev_close = close.iloc[-2] if len(close) > 1 else price
+            prev_close = closes[-2] if len(closes) > 1 else price
             change_pct = ((price - prev_close) / prev_close) * 100 if prev_close else 0
 
-            # VWAP (intraday approximation)
-            if not hist_5m.empty:
-                tp   = (hist_5m['High'] + hist_5m['Low'] + hist_5m['Close']) / 3
-                vwap = (tp * hist_5m['Volume']).sum() / hist_5m['Volume'].sum() \
-                       if hist_5m['Volume'].sum() > 0 else price
-            else:
-                vwap = price
+            # VWAP approximation using daily data
+            recent_tp  = [(highs[-i] + lows[-i] + closes[-i]) / 3 for i in range(1, 6)]
+            recent_vol = [volumes[-i] for i in range(1, 6)]
+            vwap = sum(tp * v for tp, v in zip(recent_tp, recent_vol)) / sum(recent_vol) \
+                   if sum(recent_vol) > 0 else price
 
-            # ATR (14-period)
+            # ATR (14-period) — pure Python
             tr_list = []
-            for i in range(1, min(15, len(hist))):
+            for i in range(1, min(15, len(closes))):
                 tr = max(
-                    high.iloc[-i] - low.iloc[-i],
-                    abs(high.iloc[-i] - close.iloc[-i-1]),
-                    abs(low.iloc[-i]  - close.iloc[-i-1])
+                    highs[-i] - lows[-i],
+                    abs(highs[-i] - closes[-i-1]),
+                    abs(lows[-i]  - closes[-i-1])
                 )
                 tr_list.append(tr)
             atr_14   = sum(tr_list) / len(tr_list) if tr_list else 0
             atr_base = sum(tr_list[-5:]) / 5 if len(tr_list) >= 5 else atr_14
 
-            # RSI (14)
-            delta  = close.diff().dropna()
-            gain   = delta.clip(lower=0).tail(14).mean()
-            loss   = (-delta.clip(upper=0)).tail(14).mean()
-            rs     = gain / loss if loss != 0 else 100
+            # RSI (14) — pure Python
+            deltas = [closes[-i] - closes[-i-1] for i in range(1, 15)]
+            gains  = [d for d in deltas if d > 0]
+            losses = [-d for d in deltas if d < 0]
+            avg_g  = sum(gains)  / 14
+            avg_l  = sum(losses) / 14
+            rs     = avg_g / avg_l if avg_l > 0 else 100
             rsi    = 100 - (100 / (1 + rs))
 
-            # ADX (simplified)
-            adx = self._calc_adx(high, low, close)
+            # ADX — pure Python
+            adx = self._calc_adx(highs, lows, closes)
 
-            # 52-week high/low
-            high_52w = high.tail(252).max() if len(high) >= 252 else high.max()
-            low_52w  = low.tail(252).min()  if len(low)  >= 252 else low.min()
-            high_20d = high.tail(20).max()
+            high_52w = max(highs[-252:] if len(highs) >= 252 else highs)
+            low_52w  = min(lows[-252:]  if len(lows)  >= 252 else lows)
+            high_20d = max(highs[-20:]  if len(highs) >= 20  else highs)
 
-            # Gap %
             open_price = info.get('regularMarketOpen') or price
             gap_pct    = ((open_price - prev_close) / prev_close) * 100 if prev_close else 0
-
-            # Dollar volume
             dollar_vol = price * today_vol
 
             return {
@@ -160,26 +153,26 @@ class StockConnector:
             logger.warning(f"yfinance failed for {symbol}: {e}")
             return None
 
-    def _calc_adx(self, high, low, close, period=14) -> float:
+    def _calc_adx(self, highs, lows, closes, period=14) -> float:
         try:
-            if len(high) < period + 2:
+            if len(highs) < period + 2:
                 return 20.0
             tr_list, pdm_list, ndm_list = [], [], []
             for i in range(1, period + 1):
-                h, l, pc = high.iloc[-i], low.iloc[-i], close.iloc[-i-1]
+                h, l, pc = highs[-i], lows[-i], closes[-i-1]
                 tr_list.append(max(h - l, abs(h - pc), abs(l - pc)))
-                pdm_list.append(max(high.iloc[-i] - high.iloc[-i-1], 0)
-                                 if high.iloc[-i] - high.iloc[-i-1] >
-                                    low.iloc[-i-1] - low.iloc[-i] else 0)
-                ndm_list.append(max(low.iloc[-i-1] - low.iloc[-i], 0)
-                                 if low.iloc[-i-1] - low.iloc[-i] >
-                                    high.iloc[-i] - high.iloc[-i-1] else 0)
-            atr  = sum(tr_list) / period
+                pdm = max(highs[-i] - highs[-i-1], 0) \
+                      if highs[-i] - highs[-i-1] > lows[-i-1] - lows[-i] else 0
+                ndm = max(lows[-i-1] - lows[-i], 0) \
+                      if lows[-i-1] - lows[-i] > highs[-i] - highs[-i-1] else 0
+                pdm_list.append(pdm)
+                ndm_list.append(ndm)
+            atr = sum(tr_list) / period
             if atr == 0:
                 return 20.0
-            pdi  = (sum(pdm_list) / period) / atr * 100
-            ndi  = (sum(ndm_list) / period) / atr * 100
-            dx   = abs(pdi - ndi) / (pdi + ndi) * 100 if (pdi + ndi) > 0 else 0
+            pdi = (sum(pdm_list) / period) / atr * 100
+            ndi = (sum(ndm_list) / period) / atr * 100
+            dx  = abs(pdi - ndi) / (pdi + ndi) * 100 if (pdi + ndi) > 0 else 0
             return round(dx, 1)
         except Exception:
             return 20.0
