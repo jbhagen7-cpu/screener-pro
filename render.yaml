@@ -2,7 +2,7 @@ services:
   - type: web
     name: screener-pro
     env: python
-    buildCommand: pip install --upgrade pip && pip install -r requirements.txt
+    buildCommand: pip install --upgrade pip wheel setuptools && pip install -r requirements.txt
     startCommand: gunicorn app:app --bind 0.0.0.0:$PORT --workers 2 --timeout 120
     envVars:
       - key: ALPHA_VANTAGE_KEY
