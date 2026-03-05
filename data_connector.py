@@ -305,20 +305,21 @@ class StockConnector:
             try:
                 data = self.fetch(sym)
                 if not data:
+                    logger.info(f"  ✗ {sym} — no data returned")
                     continue
-                # Price filter
                 if data['price'] > cfg.STOCK_MAX_PRICE or data['price'] <= 0:
+                    logger.info(f"  ✗ {sym} — price ${data['price']} outside range")
                     continue
-                # Liquidity filters
                 if data['volume'] < cfg.STOCK_MIN_VOLUME:
+                    logger.info(f"  ✗ {sym} — volume {data['volume']} too low")
                     continue
                 if data['dollar_volume'] < cfg.STOCK_MIN_DOLLAR_VOLUME:
+                    logger.info(f"  ✗ {sym} — dollar volume {data['dollar_volume']} too low")
                     continue
                 results.append(data)
-                logger.debug(f"  ✓ {sym} ${data['price']} RVOL={data['rvol']}")
+                logger.info(f"  ✓ {sym} ${data['price']} RVOL={data['rvol']}")
             except Exception as e:
                 logger.warning(f"Error scanning {sym}: {e}")
-            # Small delay to respect rate limits
             if i % 10 == 9:
                 time.sleep(1)
         logger.info(f"Stock scan complete: {len(results)} passed filters")
