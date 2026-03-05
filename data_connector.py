@@ -62,67 +62,92 @@ class StockConnector:
     # ── yfinance fetch ───────────────────────────────────────────────────────
     def fetch_yfinance(self, symbol: str) -> Optional[dict]:
         try:
-            tk   = yf.Ticker(symbol)
-            info = tk.info
+            import yfinance as yf
 
-            price = info.get('currentPrice') or info.get('regularMarketPrice')
-            if not price:
+            # Use download which is more reliable than Ticker.info on servers
+            hist = yf.download(
+                symbol,
+                period='60d',
+                interval='1d',
+                progress=False,
+                auto_adjust=True,
+            )
+
+            if hist is None or len(hist) < 5:
                 return None
 
-            # Get history as dict of lists (no pandas needed)
-            hist    = tk.history(period='60d', interval='1d')
-            if hist is None or len(hist) < 10:
+            # Flatten MultiIndex columns if present
+            if hasattr(hist.columns, 'levels'):
+                hist.columns = hist.columns.get_level_values(0)
+
+            closes  = list(hist['Close'].dropna())
+            volumes = list(hist['Volume'].dropna())
+            highs   = list(hist['High'].dropna())
+            lows    = list(hist['Low'].dropna())
+
+            if len(closes) < 5:
                 return None
 
-            closes  = list(hist['Close'])
-            volumes = list(hist['Volume'])
-            highs   = list(hist['High'])
-            lows    = list(hist['Low'])
+            price      = float(closes[-1])
+            prev_close = float(closes[-2]) if len(closes) > 1 else price
 
-            today_vol  = volumes[-1]
-            avg_vol_20 = sum(volumes[-20:]) / min(20, len(volumes))
-            rvol       = today_vol / avg_vol_20 if avg_vol_20 > 0 else 1.0
+            if price <= 0:
+                return None
 
-            prev_close = closes[-2] if len(closes) > 1 else price
             change_pct = ((price - prev_close) / prev_close) * 100 if prev_close else 0
 
-            # VWAP approximation using daily data
-            recent_tp  = [(highs[-i] + lows[-i] + closes[-i]) / 3 for i in range(1, 6)]
-            recent_vol = [volumes[-i] for i in range(1, 6)]
-            vwap = sum(tp * v for tp, v in zip(recent_tp, recent_vol)) / sum(recent_vol) \
-                   if sum(recent_vol) > 0 else price
+            today_vol  = float(volumes[-1]) if volumes else 0
+            avg_vol_20 = sum(float(v) for v in volumes[-20:]) / min(20, len(volumes))
+            rvol       = today_vol / avg_vol_20 if avg_vol_20 > 0 else 1.0
 
-            # ATR (14-period) — pure Python
+            # VWAP approximation
+            n = min(5, len(closes))
+            recent_tp  = [(float(highs[-i]) + float(lows[-i]) + float(closes[-i])) / 3 for i in range(1, n+1)]
+            recent_vol = [float(volumes[-i]) for i in range(1, n+1)]
+            total_vol  = sum(recent_vol)
+            vwap = sum(tp * v for tp, v in zip(recent_tp, recent_vol)) / total_vol if total_vol > 0 else price
+
+            # ATR
             tr_list = []
             for i in range(1, min(15, len(closes))):
                 tr = max(
-                    highs[-i] - lows[-i],
-                    abs(highs[-i] - closes[-i-1]),
-                    abs(lows[-i]  - closes[-i-1])
+                    float(highs[-i]) - float(lows[-i]),
+                    abs(float(highs[-i]) - float(closes[-i-1])),
+                    abs(float(lows[-i])  - float(closes[-i-1]))
                 )
                 tr_list.append(tr)
             atr_14   = sum(tr_list) / len(tr_list) if tr_list else 0
             atr_base = sum(tr_list[-5:]) / 5 if len(tr_list) >= 5 else atr_14
 
-            # RSI (14) — pure Python
-            deltas = [closes[-i] - closes[-i-1] for i in range(1, 15)]
+            # RSI
+            deltas = [float(closes[-i]) - float(closes[-i-1]) for i in range(1, min(15, len(closes)))]
             gains  = [d for d in deltas if d > 0]
             losses = [-d for d in deltas if d < 0]
-            avg_g  = sum(gains)  / 14
-            avg_l  = sum(losses) / 14
-            rs     = avg_g / avg_l if avg_l > 0 else 100
+            avg_g  = sum(gains)  / 14 if gains  else 0
+            avg_l  = sum(losses) / 14 if losses else 0.001
+            rs     = avg_g / avg_l
             rsi    = 100 - (100 / (1 + rs))
 
-            # ADX — pure Python
+            # ADX
             adx = self._calc_adx(highs, lows, closes)
 
-            high_52w = max(highs[-252:] if len(highs) >= 252 else highs)
-            low_52w  = min(lows[-252:]  if len(lows)  >= 252 else lows)
-            high_20d = max(highs[-20:]  if len(highs) >= 20  else highs)
+            high_52w = max(float(h) for h in highs[-252:]) if len(highs) >= 252 else max(float(h) for h in highs)
+            low_52w  = min(float(l) for l in lows[-252:])  if len(lows)  >= 252 else min(float(l) for l in lows)
+            high_20d = max(float(h) for h in highs[-20:])  if len(highs) >= 20  else max(float(h) for h in highs)
 
-            open_price = info.get('regularMarketOpen') or price
+            # Try to get open price for gap calc
+            open_price = float(hist['Open'].iloc[-1]) if 'Open' in hist.columns else price
             gap_pct    = ((open_price - prev_close) / prev_close) * 100 if prev_close else 0
             dollar_vol = price * today_vol
+
+            # Get name from Ticker info (best effort)
+            name = symbol
+            try:
+                tk = yf.Ticker(symbol)
+                info = tk.fast_info
+                name = getattr(info, 'company_name', symbol) or symbol
+            except Exception:
+                pass
 
             return {
                 'symbol':        symbol,
@@ -143,10 +168,10 @@ class StockConnector:
                 'high_52w':      round(high_52w, 4),
                 'low_52w':       round(low_52w, 4),
                 'high_20d':      round(high_20d, 4),
-                'market_cap':    info.get('marketCap', 0),
-                'name':          info.get('longName') or info.get('shortName') or symbol,
-                'sector':        info.get('sector', ''),
-                'has_earnings':  self._check_earnings(info),
+                'market_cap':    0,
+                'name':          name,
+                'sector':        '',
+                'has_earnings':  False,
                 'source':        'yfinance',
             }
         except Exception as e:
