@@ -1,0 +1,1036 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Screener Pro — Config</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:       #080c10;
+    --surface:  #0d1117;
+    --card:     #111820;
+    --border:   #1e2d3d;
+    --accent:   #00e5ff;
+    --green:    #00ff88;
+    --red:      #ff3b5c;
+    --yellow:   #f5c518;
+    --muted:    #4a6375;
+    --text:     #cdd9e5;
+    --heading:  #e8f4fd;
+    --mono:     'Space Mono', monospace;
+    --sans:     'Syne', sans-serif;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--mono);
+    font-size: 13px;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* Grid background */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(0,229,255,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0,229,255,0.03) 1px, transparent 1px);
+    background-size: 40px 40px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* Glow blob */
+  body::after {
+    content: '';
+    position: fixed;
+    top: -200px; left: -200px;
+    width: 600px; height: 600px;
+    background: radial-gradient(circle, rgba(0,229,255,0.06) 0%, transparent 70%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .app { position: relative; z-index: 1; max-width: 900px; margin: 0 auto; padding: 24px 16px 80px; }
+
+  /* Header */
+  header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 20px 0 28px;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 32px;
+    flex-wrap: wrap; gap: 12px;
+  }
+  .logo {
+    font-family: var(--sans);
+    font-size: 22px; font-weight: 800;
+    color: var(--heading);
+    letter-spacing: -0.5px;
+  }
+  .logo span { color: var(--accent); }
+  .status-pill {
+    display: flex; align-items: center; gap: 8px;
+    background: rgba(0,255,136,0.08);
+    border: 1px solid rgba(0,255,136,0.2);
+    border-radius: 20px;
+    padding: 6px 14px;
+    font-size: 11px; color: var(--green);
+    letter-spacing: 0.5px;
+  }
+  .status-dot {
+    width: 6px; height: 6px; border-radius: 50%;
+    background: var(--green);
+    animation: pulse 2s infinite;
+  }
+  @keyframes pulse {
+    0%,100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.4; transform: scale(0.8); }
+  }
+
+  /* Nav tabs */
+  .tabs {
+    display: flex; gap: 2px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 4px;
+    margin-bottom: 28px;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  .tabs::-webkit-scrollbar { display: none; }
+  .tab {
+    flex: 1; min-width: fit-content;
+    padding: 9px 14px;
+    border-radius: 7px;
+    border: none; background: transparent;
+    color: var(--muted);
+    font-family: var(--mono); font-size: 11px;
+    cursor: pointer;
+    transition: all 0.2s;
+    white-space: nowrap;
+    letter-spacing: 0.3px;
+  }
+  .tab:hover { color: var(--text); background: rgba(255,255,255,0.04); }
+  .tab.active {
+    background: var(--card);
+    color: var(--accent);
+    border: 1px solid var(--border);
+  }
+
+  /* Sections */
+  .section { display: none; animation: fadeIn 0.25s ease; }
+  .section.active { display: block; }
+  @keyframes fadeIn { from { opacity:0; transform:translateY(6px); } to { opacity:1; transform:translateY(0); } }
+
+  /* Cards */
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 16px;
+  }
+  .card-title {
+    font-family: var(--sans);
+    font-size: 13px; font-weight: 700;
+    color: var(--heading);
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    margin-bottom: 18px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .card-title .icon { font-size: 15px; }
+
+  /* Form rows */
+  .field { margin-bottom: 16px; }
+  .field:last-child { margin-bottom: 0; }
+  label {
+    display: block;
+    font-size: 11px; color: var(--muted);
+    letter-spacing: 0.5px; text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+  input[type="text"], input[type="number"], input[type="password"], textarea, select {
+    width: 100%;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 7px;
+    color: var(--text);
+    font-family: var(--mono); font-size: 13px;
+    padding: 10px 12px;
+    outline: none;
+    transition: border-color 0.2s;
+    -webkit-appearance: none;
+  }
+  input:focus, textarea:focus, select:focus { border-color: var(--accent); }
+  textarea { resize: vertical; min-height: 100px; line-height: 1.6; }
+  select option { background: var(--card); }
+
+  /* API key field */
+  .api-row { display: flex; gap: 8px; }
+  .api-row input { flex: 1; }
+  .btn-reveal {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 7px; padding: 0 12px;
+    color: var(--muted); font-family: var(--mono); font-size: 12px;
+    cursor: pointer; transition: all 0.2s; white-space: nowrap;
+  }
+  .btn-reveal:hover { color: var(--accent); border-color: var(--accent); }
+
+  /* Two column grid */
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  @media (max-width: 500px) { .grid-2 { grid-template-columns: 1fr; } }
+
+  /* Sliders */
+  .slider-row {
+    display: flex; align-items: center; gap: 12px;
+    margin-bottom: 14px;
+  }
+  .slider-row:last-child { margin-bottom: 0; }
+  .slider-label {
+    font-size: 11px; color: var(--text);
+    min-width: 180px; letter-spacing: 0.2px;
+  }
+  .slider-label small { display: block; color: var(--muted); font-size: 10px; margin-top: 2px; }
+  .slider-wrap { flex: 1; position: relative; }
+  input[type="range"] {
+    width: 100%; height: 4px;
+    -webkit-appearance: none;
+    background: var(--border);
+    border-radius: 2px;
+    outline: none;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+  }
+  input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 16px; height: 16px;
+    border-radius: 50%;
+    background: var(--accent);
+    border: 2px solid var(--bg);
+    box-shadow: 0 0 6px rgba(0,229,255,0.5);
+    cursor: pointer;
+    transition: transform 0.15s;
+  }
+  input[type="range"]::-webkit-slider-thumb:hover { transform: scale(1.2); }
+  input[type="range"]::-moz-range-thumb {
+    width: 16px; height: 16px; border-radius: 50%;
+    background: var(--accent); border: 2px solid var(--bg);
+    cursor: pointer;
+  }
+  .slider-val {
+    min-width: 42px; text-align: right;
+    font-size: 13px; color: var(--accent);
+    font-weight: 700;
+  }
+
+  /* Weight total indicator */
+  .weight-total {
+    display: flex; align-items: center; justify-content: space-between;
+    background: var(--bg); border: 1px solid var(--border);
+    border-radius: 8px; padding: 10px 14px;
+    margin-top: 16px;
+  }
+  .weight-total span { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; }
+  .weight-total strong { font-size: 15px; }
+  .weight-total strong.ok { color: var(--green); }
+  .weight-total strong.warn { color: var(--yellow); }
+  .weight-total strong.err { color: var(--red); }
+
+  /* Tag list (universe editor) */
+  .tag-wrap {
+    display: flex; flex-wrap: wrap; gap: 6px;
+    background: var(--bg); border: 1px solid var(--border);
+    border-radius: 7px; padding: 10px;
+    min-height: 60px;
+  }
+  .tag {
+    display: flex; align-items: center; gap: 5px;
+    background: rgba(0,229,255,0.08);
+    border: 1px solid rgba(0,229,255,0.2);
+    border-radius: 5px; padding: 4px 8px;
+    font-size: 11px; color: var(--accent);
+    letter-spacing: 0.5px;
+    animation: tagIn 0.15s ease;
+  }
+  @keyframes tagIn { from { opacity:0; transform:scale(0.85); } to { opacity:1; transform:scale(1); } }
+  .tag-remove {
+    background: none; border: none;
+    color: var(--muted); cursor: pointer;
+    font-size: 13px; line-height: 1; padding: 0;
+    transition: color 0.15s;
+  }
+  .tag-remove:hover { color: var(--red); }
+  .tag-input-row { display: flex; gap: 8px; margin-top: 10px; }
+  .tag-input-row input { flex: 1; }
+  .btn-add {
+    background: rgba(0,229,255,0.1);
+    border: 1px solid rgba(0,229,255,0.3);
+    border-radius: 7px; padding: 0 16px;
+    color: var(--accent); font-family: var(--mono); font-size: 12px;
+    cursor: pointer; transition: all 0.2s; white-space: nowrap;
+  }
+  .btn-add:hover { background: rgba(0,229,255,0.18); }
+
+  /* Toggle switch */
+  .toggle-row {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 14px;
+  }
+  .toggle-row:last-child { margin-bottom: 0; }
+  .toggle-info { font-size: 12px; color: var(--text); }
+  .toggle-info small { display: block; color: var(--muted); font-size: 10px; margin-top: 2px; }
+  .toggle { position: relative; width: 40px; height: 22px; }
+  .toggle input { opacity: 0; width: 0; height: 0; }
+  .toggle-slider {
+    position: absolute; inset: 0;
+    background: var(--border); border-radius: 11px;
+    cursor: pointer; transition: background 0.2s;
+  }
+  .toggle-slider::before {
+    content: '';
+    position: absolute; left: 3px; top: 3px;
+    width: 16px; height: 16px; border-radius: 50%;
+    background: var(--muted); transition: all 0.2s;
+  }
+  .toggle input:checked + .toggle-slider { background: rgba(0,229,255,0.2); border: 1px solid var(--accent); }
+  .toggle input:checked + .toggle-slider::before { background: var(--accent); transform: translateX(18px); }
+
+  /* Action bar */
+  .action-bar {
+    position: fixed; bottom: 0; left: 0; right: 0;
+    background: rgba(8,12,16,0.95);
+    backdrop-filter: blur(12px);
+    border-top: 1px solid var(--border);
+    padding: 14px 24px;
+    display: flex; gap: 10px; justify-content: flex-end; align-items: center;
+    z-index: 100;
+  }
+  .btn {
+    font-family: var(--mono); font-size: 12px;
+    border-radius: 8px; padding: 10px 20px;
+    cursor: pointer; border: none;
+    transition: all 0.2s; letter-spacing: 0.3px;
+  }
+  .btn-ghost {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--muted);
+  }
+  .btn-ghost:hover { border-color: var(--text); color: var(--text); }
+  .btn-primary {
+    background: var(--accent); color: var(--bg);
+    font-weight: 700;
+  }
+  .btn-primary:hover { background: #33ecff; box-shadow: 0 0 16px rgba(0,229,255,0.3); }
+  .btn-secondary {
+    background: rgba(0,229,255,0.1);
+    border: 1px solid rgba(0,229,255,0.25);
+    color: var(--accent);
+  }
+  .btn-secondary:hover { background: rgba(0,229,255,0.18); }
+
+  /* Save toast */
+  .toast {
+    position: fixed; top: 20px; right: 20px;
+    background: var(--card); border: 1px solid var(--green);
+    border-radius: 10px; padding: 12px 18px;
+    color: var(--green); font-size: 12px;
+    transform: translateY(-20px); opacity: 0;
+    transition: all 0.3s; z-index: 999;
+    pointer-events: none;
+  }
+  .toast.show { transform: translateY(0); opacity: 1; }
+
+  /* Hint text */
+  .hint { font-size: 10px; color: var(--muted); margin-top: 6px; line-height: 1.5; }
+  .hint a { color: var(--accent); text-decoration: none; }
+  .hint a:hover { text-decoration: underline; }
+
+  /* Divider */
+  .divider { border: none; border-top: 1px solid var(--border); margin: 18px 0; }
+
+  /* Section header badge */
+  .badge {
+    font-size: 10px; padding: 2px 8px; border-radius: 4px;
+    background: rgba(0,229,255,0.1); color: var(--accent);
+    border: 1px solid rgba(0,229,255,0.2);
+    letter-spacing: 0.5px;
+  }
+  .badge.green { background: rgba(0,255,136,0.08); color: var(--green); border-color: rgba(0,255,136,0.2); }
+
+  /* Crypto slider accent */
+  .crypto input[type="range"]::-webkit-slider-thumb { background: var(--yellow); box-shadow: 0 0 6px rgba(245,197,24,0.5); }
+  .crypto .slider-val { color: var(--yellow); }
+  .crypto .weight-total strong.ok { color: var(--yellow); }
+
+  /* Responsive */
+  @media (max-width: 600px) {
+    .slider-label { min-width: 130px; font-size: 10px; }
+    .action-bar { padding: 12px 16px; }
+    .btn { padding: 9px 14px; font-size: 11px; }
+  }
+</style>
+</head>
+<body>
+<div class="app">
+
+  <!-- Header -->
+  <header>
+    <div class="logo">SCREENER <span>PRO</span> <span style="color:var(--muted);font-size:14px;font-weight:400">// CONFIG</span></div>
+    <div class="status-pill"><div class="status-dot"></div> SETTINGS LOADED</div>
+  </header>
+
+  <!-- Tabs -->
+  <div class="tabs">
+    <button class="tab active" onclick="switchTab('api')">🔑 API Keys</button>
+    <button class="tab" onclick="switchTab('filters')">🎯 Filters</button>
+    <button class="tab" onclick="switchTab('stock-weights')">📊 Stock Signals</button>
+    <button class="tab" onclick="switchTab('crypto-weights')">🪙 Crypto Signals</button>
+    <button class="tab" onclick="switchTab('universe')">🌐 Universe</button>
+    <button class="tab" onclick="switchTab('paper')">💹 Paper Trading</button>
+    <button class="tab" onclick="switchTab('dashboard')">🖥️ Dashboard</button>
+  </div>
+
+  <!-- ── API KEYS ── -->
+  <div class="section active" id="sec-api">
+    <div class="card">
+      <div class="card-title"><span class="icon">🔑</span> Alpha Vantage API Key <span class="badge green">FREE</span></div>
+      <div class="field">
+        <label>API Key</label>
+        <div class="api-row">
+          <input type="password" id="av-key" placeholder="Paste your Alpha Vantage key here…" value="">
+          <button class="btn-reveal" onclick="toggleReveal('av-key', this)">SHOW</button>
+        </div>
+        <p class="hint">Get your free key at <a href="https://alphavantage.co/support/#api-key" target="_blank">alphavantage.co/support/#api-key</a> — no credit card required.</p>
+      </div>
+      <hr class="divider">
+      <div class="field">
+        <label>Data Priority Strategy</label>
+        <select id="data-strategy">
+          <option value="yfinance_first">yfinance first → Alpha Vantage fallback</option>
+          <option value="av_first">Alpha Vantage first → yfinance fallback</option>
+          <option value="av_only">Alpha Vantage only</option>
+          <option value="yfinance_only">yfinance only (no API key needed)</option>
+        </select>
+        <p class="hint">Recommended: yfinance first (faster), Alpha Vantage as reliable fallback.</p>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title"><span class="icon">🦎</span> CoinGecko <span class="badge green">NO KEY NEEDED</span></div>
+      <div class="field">
+        <label>Rate Limit (calls/minute)</label>
+        <input type="number" id="cg-rate" value="30" min="5" max="50">
+        <p class="hint">Free tier allows 10–50 calls/min. Keep at 30 to avoid throttling.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── FILTERS ── -->
+  <div class="section" id="sec-filters">
+    <div class="card">
+      <div class="card-title"><span class="icon">📈</span> Stock Filters</div>
+      <div class="grid-2">
+        <div class="field">
+          <label>Max Price ($)</label>
+          <input type="number" id="stock-max-price" value="20" min="1" max="100" step="0.5">
+        </div>
+        <div class="field">
+          <label>Top N Stocks to Show</label>
+          <input type="number" id="stock-top-n" value="5" min="1" max="20">
+        </div>
+        <div class="field">
+          <label>Min Avg Daily Volume</label>
+          <input type="number" id="stock-min-vol" value="500000" min="0" step="50000">
+        </div>
+        <div class="field">
+          <label>Min Dollar Volume ($)</label>
+          <input type="number" id="stock-min-dvol" value="1000000" min="0" step="100000">
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title"><span class="icon">🪙</span> Crypto Filters</div>
+      <div class="grid-2">
+        <div class="field">
+          <label>Max Price ($)</label>
+          <input type="number" id="crypto-max-price" value="20" min="0.001" max="100" step="0.5">
+        </div>
+        <div class="field">
+          <label>Top N Cryptos to Show</label>
+          <input type="number" id="crypto-top-n" value="5" min="1" max="20">
+        </div>
+        <div class="field">
+          <label>Min 24h Volume (USD)</label>
+          <input type="number" id="crypto-min-vol" value="500000" min="0" step="50000">
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── STOCK SIGNAL WEIGHTS ── -->
+  <div class="section" id="sec-stock-weights">
+    <div class="card">
+      <div class="card-title"><span class="icon">📊</span> Stock Signal Weights <span class="badge">10 SIGNALS</span></div>
+      <p class="hint" style="margin-bottom:16px">Adjust the weight of each signal in the composite score. Total must equal 100%.</p>
+
+      <div class="slider-row">
+        <div class="slider-label">RVOL <small>Relative Volume</small></div>
+        <div class="slider-wrap"><input type="range" class="sw" id="sw-rvol" min="0" max="30" step="1" value="15" oninput="updateWeights('stock')"></div>
+        <div class="slider-val" id="sv-rvol">15%</div>
+      </div>
+      <div class="slider-row">
+        <div class="slider-label">Momentum <small>% Change + Multi-TF</small></div>
+        <div class="slider-wrap"><input type="range" class="sw" id="sw-momentum" min="0" max="30" step="1" value="14" oninput="updateWeights('stock')"></div>
+        <div class="slider-val" id="sv-momentum">14%</div>
+      </div>
+      <div class="slider-row">
+        <div class="slider-label">VWAP Position <small>Institutional support</small></div>
+        <div class="slider-wrap"><input type="range" class="sw" id="sw-vwap" min="0" max="30" step="1" value="13" oninput="updateWeights('stock')"></div>
+        <div class="slider-val" id="sv-vwap">13%</div>
+      </div>
+      <div class="slider-row">
+        <div class="slider-label">Breakout <small>HOD / Range break</small></div>
+        <div class="slider-wrap"><input type="range" class="sw" id="sw-breakout" min="0" max="30" step="1" value="12" oninput="updateWeights('stock')"></div>
+        <div class="slider-val" id="sv-breakout">12%</div>
+      </div>
+      <div class="slider-row">
+        <div class="slider-label">ATR Expansion <small>Volatility spike</small></div>
+        <div class="slider-wrap"><input type="range" class="sw" id="sw-atr" min="0" max="30" step="1" value="11" oninput="updateWeights('stock')"></div>
+        <div class="slider-val" id="sv-atr">11%</div>
+      </div>
+      <div class="slider-row">
+        <div class="slider-label">RSI <small>Relative Strength Index</small></div>
+        <div class="slider-wrap"><input type="range" class="sw" id="sw-rsi" min="0" max="30" step="1" value="10" oninput="updateWeights('stock')"></div>
+        <div class="slider-val" id="sv-rsi">10%</div>
+      </div>
+      <div class="slider-row">
+        <div class="slider-label">ADX <small>Trend Strength</small></div>
+        <div class="slider-wrap"><input type="range" class="sw" id="sw-adx" min="0" max="30" step="1" value="9" oninput="updateWeights('stock')"></div>
+        <div class="slider-val" id="sv-adx">9%</div>
+      </div>
+      <div class="slider-row">
+        <div class="slider-label">Gap Strength <small>Premarket vs prior close</small></div>
+        <div class="slider-wrap"><input type="range" class="sw" id="sw-gap" min="0" max="30" step="1" value="8" oninput="updateWeights('stock')"></div>
+        <div class="slider-val" id="sv-gap">8%</div>
+      </div>
+      <div class="slider-row">
+        <div class="slider-label">Liquidity Filter <small>Spread + dollar volume</small></div>
+        <div class="slider-wrap"><input type="range" class="sw" id="sw-liquidity" min="0" max="30" step="1" value="5" oninput="updateWeights('stock')"></div>
+        <div class="slider-val" id="sv-liquidity">5%</div>
+      </div>
+      <div class="slider-row">
+        <div class="slider-label">News / Catalyst <small>Earnings, upgrades, events</small></div>
+        <div class="slider-wrap"><input type="range" class="sw" id="sw-catalyst" min="0" max="30" step="1" value="3" oninput="updateWeights('stock')"></div>
+        <div class="slider-val" id="sv-catalyst">3%</div>
+      </div>
+
+      <div class="weight-total">
+        <span>Total Weight</span>
+        <strong id="stock-total" class="ok">100%</strong>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── CRYPTO SIGNAL WEIGHTS ── -->
+  <div class="section" id="sec-crypto-weights">
+    <div class="card crypto">
+      <div class="card-title"><span class="icon">🪙</span> Crypto Signal Weights <span class="badge">5 SIGNALS</span></div>
+      <p class="hint" style="margin-bottom:16px">Adjust the weight of each crypto signal. Total must equal 100%.</p>
+
+      <div class="slider-row">
+        <div class="slider-label">Volume Spike <small>24h vol vs 7-day avg</small></div>
+        <div class="slider-wrap"><input type="range" class="cw" id="cw-volspike" min="0" max="60" step="1" value="30" oninput="updateWeights('crypto')"></div>
+        <div class="slider-val" id="cv-volspike">30%</div>
+      </div>
+      <div class="slider-row">
+        <div class="slider-label">Momentum <small>1h + 24h price change</small></div>
+        <div class="slider-wrap"><input type="range" class="cw" id="cw-momentum" min="0" max="60" step="1" value="25" oninput="updateWeights('crypto')"></div>
+        <div class="slider-val" id="cv-momentum">25%</div>
+      </div>
+      <div class="slider-row">
+        <div class="slider-label">Breakout <small>7-day + 30-day range</small></div>
+        <div class="slider-wrap"><input type="range" class="cw" id="cw-breakout" min="0" max="60" step="1" value="20" oninput="updateWeights('crypto')"></div>
+        <div class="slider-val" id="cv-breakout">20%</div>
+      </div>
+      <div class="slider-row">
+        <div class="slider-label">Volatility <small>24h vol vs baseline</small></div>
+        <div class="slider-wrap"><input type="range" class="cw" id="cw-volatility" min="0" max="60" step="1" value="15" oninput="updateWeights('crypto')"></div>
+        <div class="slider-val" id="cv-volatility">15%</div>
+      </div>
+      <div class="slider-row">
+        <div class="slider-label">Liquidity <small>Spread + volume depth</small></div>
+        <div class="slider-wrap"><input type="range" class="cw" id="cw-liquidity" min="0" max="60" step="1" value="10" oninput="updateWeights('crypto')"></div>
+        <div class="slider-val" id="cv-liquidity">10%</div>
+      </div>
+
+      <div class="weight-total crypto">
+        <span>Total Weight</span>
+        <strong id="crypto-total" class="ok">100%</strong>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── UNIVERSE ── -->
+  <div class="section" id="sec-universe">
+    <div class="card">
+      <div class="card-title"><span class="icon">📈</span> Stock Universe <span id="stock-tag-count" class="badge">70 tickers</span></div>
+      <p class="hint" style="margin-bottom:12px">Tickers to scan for stock signals. All must be Yahoo Finance compatible.</p>
+      <div class="tag-wrap" id="stock-tags"></div>
+      <div class="tag-input-row">
+        <input type="text" id="stock-tag-input" placeholder="Add ticker (e.g. AAPL)…" maxlength="10" onkeydown="if(event.key==='Enter')addTag('stock')">
+        <button class="btn-add" onclick="addTag('stock')">+ ADD</button>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title"><span class="icon">🪙</span> Crypto Universe <span id="crypto-tag-count" class="badge">40 coins</span></div>
+      <p class="hint" style="margin-bottom:12px">CoinGecko IDs to scan. Use lowercase hyphenated format (e.g. <code style="color:var(--accent)">shiba-inu</code>).</p>
+      <div class="tag-wrap" id="crypto-tags"></div>
+      <div class="tag-input-row">
+        <input type="text" id="crypto-tag-input" placeholder="Add CoinGecko ID (e.g. ripple)…" maxlength="50" onkeydown="if(event.key==='Enter')addTag('crypto')">
+        <button class="btn-add" onclick="addTag('crypto')">+ ADD</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── PAPER TRADING ── -->
+  <div class="section" id="sec-paper">
+    <div class="card">
+      <div class="card-title"><span class="icon">💰</span> Starting Balances</div>
+      <div class="grid-2">
+        <div class="field">
+          <label>Stock Account ($)</label>
+          <input type="number" id="pt-stock-bal" value="500" min="1" step="10">
+        </div>
+        <div class="field">
+          <label>Crypto Account ($)</label>
+          <input type="number" id="pt-crypto-bal" value="15" min="1" step="1">
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title"><span class="icon">⚙️</span> Order Execution</div>
+      <div class="grid-2">
+        <div class="field">
+          <label>Slippage Rate (%)</label>
+          <input type="number" id="pt-slippage" value="0.1" min="0" max="5" step="0.05">
+        </div>
+        <div class="field">
+          <label>Partial Fill Chance (%)</label>
+          <input type="number" id="pt-partial" value="15" min="0" max="100" step="1">
+        </div>
+        <div class="field">
+          <label>Partial Fill Min (%)</label>
+          <input type="number" id="pt-partial-min" value="50" min="1" max="99" step="1">
+        </div>
+        <div class="field">
+          <label>Partial Fill Max (%)</label>
+          <input type="number" id="pt-partial-max" value="99" min="1" max="99" step="1">
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title"><span class="icon">🛡️</span> Default Risk Settings</div>
+      <div class="grid-2">
+        <div class="field">
+          <label>Default Trailing Stop (%)</label>
+          <input type="number" id="pt-trail" value="5" min="0.5" max="30" step="0.5">
+        </div>
+      </div>
+      <hr class="divider">
+      <div class="toggle-row">
+        <div class="toggle-info">Enable Stop-Loss Orders<small>Automatically sell when price falls below threshold</small></div>
+        <label class="toggle"><input type="checkbox" id="pt-sl" checked><span class="toggle-slider"></span></label>
+      </div>
+      <div class="toggle-row">
+        <div class="toggle-info">Enable Take-Profit Orders<small>Automatically sell when price hits target</small></div>
+        <label class="toggle"><input type="checkbox" id="pt-tp" checked><span class="toggle-slider"></span></label>
+      </div>
+      <div class="toggle-row">
+        <div class="toggle-info">Enable Trailing Stop-Loss<small>Stop follows price as it rises</small></div>
+        <label class="toggle"><input type="checkbox" id="pt-tsl" checked><span class="toggle-slider"></span></label>
+      </div>
+      <div class="toggle-row">
+        <div class="toggle-info">Portfolio Performance Chart<small>Equity curve across all trades</small></div>
+        <label class="toggle"><input type="checkbox" id="pt-chart" checked><span class="toggle-slider"></span></label>
+      </div>
+      <div class="toggle-row">
+        <div class="toggle-info">Trade History CSV Export<small>Download all trades as CSV file</small></div>
+        <label class="toggle"><input type="checkbox" id="pt-csv" checked><span class="toggle-slider"></span></label>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── DASHBOARD ── -->
+  <div class="section" id="sec-dashboard">
+    <div class="card">
+      <div class="card-title"><span class="icon">🖥️</span> Auto-Refresh</div>
+      <div class="grid-2">
+        <div class="field">
+          <label>Refresh Interval (minutes)</label>
+          <input type="number" id="dash-refresh" value="5" min="1" max="60" step="1">
+        </div>
+        <div class="field">
+          <label>Alert Check Interval (seconds)</label>
+          <input type="number" id="dash-alert" value="30" min="5" max="300" step="5">
+        </div>
+      </div>
+      <div class="toggle-row" style="margin-top:14px">
+        <div class="toggle-info">Auto-Refresh Enabled<small>Automatically reload screening data</small></div>
+        <label class="toggle"><input type="checkbox" id="dash-auto" checked><span class="toggle-slider"></span></label>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title"><span class="icon">⭐</span> Watchlist & Alerts</div>
+      <div class="grid-2">
+        <div class="field">
+          <label>Max Watchlist Size</label>
+          <input type="number" id="dash-watchlist" value="20" min="1" max="100" step="1">
+        </div>
+      </div>
+      <hr class="divider">
+      <div class="toggle-row">
+        <div class="toggle-info">Signal Strength Bars<small>Visual 0–10 bar for each signal</small></div>
+        <label class="toggle"><input type="checkbox" id="dash-sigbars" checked><span class="toggle-slider"></span></label>
+      </div>
+      <div class="toggle-row">
+        <div class="toggle-info">Color-Coded Buy/Sell Indicators<small>Green / yellow / red signal badges</small></div>
+        <label class="toggle"><input type="checkbox" id="dash-colors" checked><span class="toggle-slider"></span></label>
+      </div>
+      <div class="toggle-row">
+        <div class="toggle-info">Price Alerts<small>Visual flag when price threshold is hit</small></div>
+        <label class="toggle"><input type="checkbox" id="dash-alerts" checked><span class="toggle-slider"></span></label>
+      </div>
+      <div class="toggle-row">
+        <div class="toggle-info">Watchlist Pinning<small>Save favorite tickers across sessions</small></div>
+        <label class="toggle"><input type="checkbox" id="dash-watchpin" checked><span class="toggle-slider"></span></label>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title"><span class="icon">🌐</span> Timezone & Locale</div>
+      <div class="field">
+        <label>Display Timezone</label>
+        <select id="dash-tz">
+          <option value="America/New_York" selected>US Eastern (ET)</option>
+          <option value="America/Chicago">US Central (CT)</option>
+          <option value="America/Denver">US Mountain (MT)</option>
+          <option value="America/Los_Angeles">US Pacific (PT)</option>
+          <option value="UTC">UTC</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+</div><!-- end .app -->
+
+<!-- Action bar -->
+<div class="action-bar">
+  <button class="btn btn-ghost" onclick="resetDefaults()">↺ RESET DEFAULTS</button>
+  <button class="btn btn-secondary" onclick="exportJSON()">⬇ EXPORT JSON</button>
+  <button class="btn btn-primary" onclick="saveConfig()">✓ SAVE CONFIG</button>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<script>
+// ── Default stock & crypto universes ──
+const DEFAULT_STOCKS = [
+  "SNDL","CLOV","WISH","EXPR","BBIG","FFIE","MULN","WKHS","RIDE","NKLA",
+  "GOEV","HYLN","OPEN","UWMC","CANO","PRTY","SPCE","ANY","CENN","ILUS",
+  "ABEV","NOK","BB","VALE","ITUB","PBR","SID","ERIC","TELL","GEVO",
+  "AMTX","REI","PLUG","FCEL","BLNK","CHPT","SOLO","KNDI","ZEV","NXTD",
+  "SHIP","TOPS","GLBS","EDRY","FREE","TBLT","BOXL","MVIS","XELA","IDEX",
+  "ATER","SPRT","MEGL","IMPP","INPX","KALI","PHUN","VERB","AMC","GME",
+  "SIRI","NAKD","CTRM","JAGX","GFAI","MINE","DPRO","ABML","CLPS","HPNN"
+];
+
+const DEFAULT_CRYPTOS = [
+  "ripple","cardano","dogecoin","shiba-inu","tron","stellar","vechain",
+  "the-open-network","hedera-hashgraph","algorand","iota","neo","zilliqa",
+  "waves","holo","ankr","coti","harmony","wink","truebit-protocol",
+  "just","sun-token","klaytn","casper-network","dent","fetch-ai",
+  "ocean-protocol","storj","loopring","band-protocol","origintrail",
+  "lto-network","loom-network","steem","hive","aelf","wanchain",
+  "ardor","nxt","syscoin"
+];
+
+let stockTickers = [...DEFAULT_STOCKS];
+let cryptoIds    = [...DEFAULT_CRYPTOS];
+
+// ── Tab switching ──
+function switchTab(id) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  event.target.classList.add('active');
+  document.getElementById('sec-' + id).classList.add('active');
+}
+
+// ── API key reveal toggle ──
+function toggleReveal(inputId, btn) {
+  const el = document.getElementById(inputId);
+  if (el.type === 'password') { el.type = 'text'; btn.textContent = 'HIDE'; }
+  else { el.type = 'password'; btn.textContent = 'SHOW'; }
+}
+
+// ── Signal weight sliders ──
+function updateWeights(type) {
+  const cls   = type === 'stock' ? 'sw' : 'cw';
+  const valPfx = type === 'stock' ? 'sv' : 'cv';
+  const idPfx  = type === 'stock' ? 'sw' : 'cw';
+  const totalId = type + '-total';
+
+  const sliders = document.querySelectorAll('input.' + cls);
+  let total = 0;
+  sliders.forEach(s => {
+    total += parseInt(s.value);
+    const key = s.id.replace(idPfx + '-', '');
+    document.getElementById(valPfx + '-' + key).textContent = s.value + '%';
+  });
+
+  const el = document.getElementById(totalId);
+  el.textContent = total + '%';
+  el.className = total === 100 ? 'ok' : total < 95 || total > 105 ? 'err' : 'warn';
+}
+
+// ── Tag/ticker management ──
+function renderTags(type) {
+  const arr  = type === 'stock' ? stockTickers : cryptoIds;
+  const wrap = document.getElementById(type + '-tags');
+  const cnt  = document.getElementById(type + '-tag-count');
+  wrap.innerHTML = '';
+  arr.forEach((t, i) => {
+    const tag = document.createElement('div');
+    tag.className = 'tag';
+    tag.innerHTML = `${t} <button class="tag-remove" onclick="removeTag('${type}',${i})">×</button>`;
+    wrap.appendChild(tag);
+  });
+  cnt.textContent = arr.length + (type === 'stock' ? ' tickers' : ' coins');
+}
+
+function removeTag(type, idx) {
+  if (type === 'stock') stockTickers.splice(idx, 1);
+  else cryptoIds.splice(idx, 1);
+  renderTags(type);
+}
+
+function addTag(type) {
+  const input = document.getElementById(type + '-tag-input');
+  const val   = input.value.trim().toUpperCase();
+  if (!val) return;
+  const arr = type === 'stock' ? stockTickers : cryptoIds;
+  const normalized = type === 'crypto' ? val.toLowerCase() : val;
+  if (!arr.includes(normalized)) {
+    arr.push(normalized);
+    renderTags(type);
+  }
+  input.value = '';
+  input.focus();
+}
+
+// ── Collect all settings ──
+function getSettings() {
+  const stockWeights = {};
+  ['rvol','momentum','vwap','breakout','atr','rsi','adx','gap','liquidity','catalyst'].forEach(k => {
+    stockWeights[k] = parseInt(document.getElementById('sw-' + k).value) / 100;
+  });
+  const cryptoWeights = {};
+  ['volspike','momentum','breakout','volatility','liquidity'].forEach(k => {
+    const mapKey = k === 'volspike' ? 'volume_spike' : k;
+    cryptoWeights[mapKey] = parseInt(document.getElementById('cw-' + k).value) / 100;
+  });
+
+  return {
+    api: {
+      alpha_vantage_key: document.getElementById('av-key').value || 'YOUR_KEY_HERE',
+      data_strategy: document.getElementById('data-strategy').value,
+      coingecko_rate_limit: parseInt(document.getElementById('cg-rate').value),
+    },
+    filters: {
+      stock_max_price: parseFloat(document.getElementById('stock-max-price').value),
+      stock_top_n: parseInt(document.getElementById('stock-top-n').value),
+      stock_min_volume: parseInt(document.getElementById('stock-min-vol').value),
+      stock_min_dollar_volume: parseInt(document.getElementById('stock-min-dvol').value),
+      crypto_max_price: parseFloat(document.getElementById('crypto-max-price').value),
+      crypto_top_n: parseInt(document.getElementById('crypto-top-n').value),
+      crypto_min_volume_24h: parseInt(document.getElementById('crypto-min-vol').value),
+    },
+    stock_signal_weights: stockWeights,
+    crypto_signal_weights: cryptoWeights,
+    universe: {
+      stocks: [...stockTickers],
+      cryptos: [...cryptoIds],
+    },
+    paper_trading: {
+      stock_balance: parseFloat(document.getElementById('pt-stock-bal').value),
+      crypto_balance: parseFloat(document.getElementById('pt-crypto-bal').value),
+      slippage_rate: parseFloat(document.getElementById('pt-slippage').value) / 100,
+      partial_fill_chance: parseFloat(document.getElementById('pt-partial').value) / 100,
+      partial_fill_min_pct: parseFloat(document.getElementById('pt-partial-min').value) / 100,
+      partial_fill_max_pct: parseFloat(document.getElementById('pt-partial-max').value) / 100,
+      trailing_stop_pct: parseFloat(document.getElementById('pt-trail').value) / 100,
+      enable_stop_loss: document.getElementById('pt-sl').checked,
+      enable_take_profit: document.getElementById('pt-tp').checked,
+      enable_trailing_stop: document.getElementById('pt-tsl').checked,
+      show_performance_chart: document.getElementById('pt-chart').checked,
+      enable_csv_export: document.getElementById('pt-csv').checked,
+    },
+    dashboard: {
+      auto_refresh: document.getElementById('dash-auto').checked,
+      refresh_interval_minutes: parseInt(document.getElementById('dash-refresh').value),
+      alert_check_interval_sec: parseInt(document.getElementById('dash-alert').value),
+      max_watchlist_size: parseInt(document.getElementById('dash-watchlist').value),
+      show_signal_bars: document.getElementById('dash-sigbars').checked,
+      color_coded_indicators: document.getElementById('dash-colors').checked,
+      price_alerts: document.getElementById('dash-alerts').checked,
+      watchlist_pinning: document.getElementById('dash-watchpin').checked,
+      timezone: document.getElementById('dash-tz').value,
+    }
+  };
+}
+
+// ── Generate config.py from settings ──
+function generateConfigPy(s) {
+  const sw = s.stock_signal_weights;
+  const cw = s.crypto_signal_weights;
+  const pt = s.paper_trading;
+  const d  = s.dashboard;
+  const f  = s.filters;
+
+  return `# =============================================================================
+# config.py — Stock & Crypto Screener Pro  (auto-generated)
+# =============================================================================
+import os
+
+ALPHA_VANTAGE_KEY      = os.environ.get("ALPHA_VANTAGE_KEY", "${s.api.alpha_vantage_key}")
+DATA_STRATEGY          = "${s.api.data_strategy}"
+COINGECKO_BASE_URL     = "https://api.coingecko.com/api/v3"
+COINGECKO_RATE_LIMIT   = ${s.api.coingecko_rate_limit}
+ALPHA_VANTAGE_BASE_URL = "https://www.alphavantage.co/query"
+
+# Filters
+STOCK_MAX_PRICE        = ${f.stock_max_price}
+CRYPTO_MAX_PRICE       = ${f.crypto_max_price}
+TOP_N_STOCKS           = ${f.stock_top_n}
+TOP_N_CRYPTOS          = ${f.crypto_top_n}
+STOCK_MIN_VOLUME       = ${f.stock_min_volume}
+STOCK_MIN_DOLLAR_VOLUME= ${f.stock_min_dollar_volume}
+CRYPTO_MIN_VOLUME_24H  = ${f.crypto_min_volume_24h}
+
+# Stock Signal Weights
+STOCK_SIGNAL_WEIGHTS = {
+    "rvol":      ${sw.rvol.toFixed(2)},
+    "momentum":  ${sw.momentum.toFixed(2)},
+    "vwap":      ${sw.vwap.toFixed(2)},
+    "breakout":  ${sw.breakout.toFixed(2)},
+    "atr":       ${sw.atr.toFixed(2)},
+    "rsi":       ${sw.rsi.toFixed(2)},
+    "adx":       ${sw.adx.toFixed(2)},
+    "gap":       ${sw.gap.toFixed(2)},
+    "liquidity": ${sw.liquidity.toFixed(2)},
+    "catalyst":  ${sw.catalyst.toFixed(2)},
+}
+
+# Crypto Signal Weights
+CRYPTO_SIGNAL_WEIGHTS = {
+    "volume_spike": ${cw.volume_spike.toFixed(2)},
+    "momentum":     ${cw.momentum.toFixed(2)},
+    "breakout":     ${cw.breakout.toFixed(2)},
+    "volatility":   ${cw.volatility.toFixed(2)},
+    "liquidity":    ${cw.liquidity.toFixed(2)},
+}
+
+# Paper Trading
+PAPER_STOCK_BALANCE   = ${pt.stock_balance}
+PAPER_CRYPTO_BALANCE  = ${pt.crypto_balance}
+SLIPPAGE_RATE         = ${pt.slippage_rate}
+PARTIAL_FILL_CHANCE   = ${pt.partial_fill_chance}
+PARTIAL_FILL_MIN_PCT  = ${pt.partial_fill_min_pct}
+PARTIAL_FILL_MAX_PCT  = ${pt.partial_fill_max_pct}
+DEFAULT_TRAILING_STOP_PCT = ${pt.trailing_stop_pct}
+ENABLE_STOP_LOSS      = ${pt.enable_stop_loss}
+ENABLE_TAKE_PROFIT    = ${pt.enable_take_profit}
+ENABLE_TRAILING_STOP  = ${pt.enable_trailing_stop}
+SHOW_PERFORMANCE_CHART= ${pt.show_performance_chart}
+ENABLE_CSV_EXPORT     = ${pt.enable_csv_export}
+
+# Dashboard
+AUTO_REFRESH_INTERVAL_MINUTES = ${d.refresh_interval_minutes}
+PRICE_ALERT_CHECK_INTERVAL_SEC= ${d.alert_check_interval_sec}
+MAX_WATCHLIST_SIZE    = ${d.max_watchlist_size}
+AUTO_REFRESH          = ${d.auto_refresh}
+SHOW_SIGNAL_BARS      = ${d.show_signal_bars}
+COLOR_CODED_INDICATORS= ${d.color_coded_indicators}
+PRICE_ALERTS          = ${d.price_alerts}
+WATCHLIST_PINNING     = ${d.watchlist_pinning}
+TIMEZONE              = "${d.timezone}"
+
+# Universe
+STOCK_SCAN_UNIVERSE = ${JSON.stringify(s.universe.stocks, null, 4).replace(/"/g, '"')}
+
+CRYPTO_SCAN_IDS = ${JSON.stringify(s.universe.cryptos, null, 4).replace(/"/g, '"')}
+
+# File paths
+RESULTS_FILE    = "screening_results.json"
+TRADES_CSV_FILE = "trades_export.csv"
+DASHBOARD_FILE  = "dashboard.html"
+PORTFOLIO_FILE  = "portfolio_state.json"
+SETTINGS_FILE   = "settings.json"
+`;
+}
+
+// ── Save (downloads both files) ──
+function saveConfig() {
+  const s = getSettings();
+  // Save JSON
+  downloadFile('settings.json', JSON.stringify(s, null, 2), 'application/json');
+  // Save config.py
+  setTimeout(() => downloadFile('config.py', generateConfigPy(s), 'text/plain'), 300);
+  showToast('✓ Saved settings.json + config.py');
+}
+
+// ── Export JSON only ──
+function exportJSON() {
+  downloadFile('settings.json', JSON.stringify(getSettings(), null, 2), 'application/json');
+  showToast('⬇ Exported settings.json');
+}
+
+function downloadFile(name, content, type) {
+  const blob = new Blob([content], { type });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = name;
+  a.click();
+  URL.revokeObjectURL(a.href);
+}
+
+// ── Reset defaults ──
+function resetDefaults() {
+  if (!confirm('Reset all settings to defaults?')) return;
+  location.reload();
+}
+
+// ── Toast ──
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2800);
+}
+
+// ── Init ──
+renderTags('stock');
+renderTags('crypto');
+updateWeights('stock');
+updateWeights('crypto');
+</script>
+</body>
+</html>
