@@ -300,22 +300,121 @@ class StockConnector:
             logger.warning(f"Alpha Vantage failed for {symbol}: {e}")
             return None
 
-    # ── Smart fetch with fallback ────────────────────────────────────────────
     def fetch(self, symbol: str) -> Optional[dict]:
-        strategy = self.strategy
-        if strategy == 'yfinance_first':
-            data = self.fetch_yfinance(symbol)
-            if not data:
-                data = self.fetch_alpha_vantage(symbol)
-        elif strategy == 'av_first':
+        # Try Alpha Vantage first (most reliable on cloud servers)
+        if self.av_key and self.av_key != "YOUR_KEY_HERE":
             data = self.fetch_alpha_vantage(symbol)
-            if not data:
-                data = self.fetch_yfinance(symbol)
-        elif strategy == 'av_only':
-            data = self.fetch_alpha_vantage(symbol)
-        else:
-            data = self.fetch_yfinance(symbol)
+            if data:
+                return data
+
+        # Try direct Yahoo Finance HTTP (bypasses yfinance library)
+        data = self.fetch_yahoo_direct(symbol)
+        if data:
+            return data
+
+        # Last resort: yfinance library
+        data = self.fetch_yfinance(symbol)
         return data
+
+    def fetch_yahoo_direct(self, symbol: str) -> Optional[dict]:
+        """Fetch from Yahoo Finance directly via HTTP, bypassing the yfinance library."""
+        try:
+            url = f"https://query1.finance.yahoo.com/v8/finance/chart/{symbol}"
+            params = {'interval': '1d', 'range': '60d'}
+            headers = {
+                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+                'Accept': 'application/json',
+                'Accept-Language': 'en-US,en;q=0.9',
+                'Referer': 'https://finance.yahoo.com',
+            }
+            r = requests.get(url, params=params, headers=headers, timeout=15)
+            if r.status_code != 200:
+                logger.warning(f"Yahoo direct HTTP {r.status_code} for {symbol}")
+                return None
+
+            j = r.json()
+            result = j.get('chart', {}).get('result', [])
+            if not result:
+                return None
+
+            meta    = result[0].get('meta', {})
+            quotes  = result[0].get('indicators', {}).get('quote', [{}])[0]
+            closes  = [x for x in (quotes.get('close') or []) if x is not None]
+            volumes = [x for x in (quotes.get('volume') or []) if x is not None]
+            highs   = [x for x in (quotes.get('high') or []) if x is not None]
+            lows    = [x for x in (quotes.get('low') or []) if x is not None]
+            opens   = [x for x in (quotes.get('open') or []) if x is not None]
+
+            if len(closes) < 5:
+                return None
+
+            price      = float(meta.get('regularMarketPrice') or closes[-1])
+            prev_close = float(closes[-2])
+            open_price = float(opens[-1]) if opens else price
+
+            if price <= 0:
+                return None
+
+            change_pct = ((price - prev_close) / prev_close) * 100
+            today_vol  = float(volumes[-1]) if volumes else 0
+            avg_vol_20 = sum(float(v) for v in volumes[-20:]) / min(20, len(volumes)) if volumes else 1
+            rvol       = today_vol / avg_vol_20 if avg_vol_20 > 0 else 1.0
+
+            n = min(5, len(closes))
+            recent_tp  = [(highs[-i] + lows[-i] + closes[-i]) / 3 for i in range(1, n+1)]
+            recent_vol = [float(volumes[-i]) for i in range(1, n+1)] if volumes else [1]*n
+            total_vol  = sum(recent_vol)
+            vwap = sum(tp * v for tp, v in zip(recent_tp, recent_vol)) / total_vol if total_vol > 0 else price
+
+            tr_list = []
+            for i in range(1, min(15, len(closes))):
+                tr = max(highs[-i]-lows[-i], abs(highs[-i]-closes[-i-1]), abs(lows[-i]-closes[-i-1]))
+                tr_list.append(tr)
+            atr_14   = sum(tr_list) / len(tr_list) if tr_list else 0
+            atr_base = sum(tr_list[-5:]) / 5 if len(tr_list) >= 5 else atr_14
+
+            deltas = [closes[-i] - closes[-i-1] for i in range(1, min(15, len(closes)))]
+            gains  = [d for d in deltas if d > 0]
+            losses = [-d for d in deltas if d < 0]
+            avg_g  = sum(gains)  / 14 if gains  else 0
+            avg_l  = sum(losses) / 14 if losses else 0.001
+            rsi    = 100 - (100 / (1 + avg_g / avg_l))
+
+            adx      = self._calc_adx(highs, lows, closes)
+            high_52w = max(highs[-252:] if len(highs) >= 252 else highs)
+            low_52w  = min(lows[-252:]  if len(lows)  >= 252 else lows)
+            high_20d = max(highs[-20:]  if len(highs) >= 20  else highs)
+            gap_pct  = ((open_price - prev_close) / prev_close) * 100
+            dollar_vol = price * today_vol
+
+            return {
+                'symbol':        symbol,
+                'price':         round(price, 4),
+                'prev_close':    round(prev_close, 4),
+                'change_pct':    round(change_pct, 2),
+                'open':          round(open_price, 4),
+                'gap_pct':       round(gap_pct, 2),
+                'volume':        int(today_vol),
+                'avg_volume_20': int(avg_vol_20),
+                'rvol':          round(rvol, 2),
+                'dollar_volume': round(dollar_vol, 0),
+                'vwap':          round(vwap, 4),
+                'atr_14':        round(atr_14, 4),
+                'atr_base':      round(atr_base, 4),
+                'rsi':           round(rsi, 1),
+                'adx':           round(adx, 1),
+                'high_52w':      round(high_52w, 4),
+                'low_52w':       round(low_52w, 4),
+                'high_20d':      round(high_20d, 4),
+                'market_cap':    0,
+                'name':          meta.get('shortName') or symbol,
+                'sector':        '',
+                'has_earnings':  False,
+                'source':        'yahoo_direct',
+            }
+        except Exception as e:
+            logger.warning(f"Yahoo direct failed for {symbol}: {e}")
+            return None
 
     # ── Scan full universe ───────────────────────────────────────────────────
     def scan_universe(self) -> list:
