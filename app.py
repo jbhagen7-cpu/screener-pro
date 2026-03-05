@@ -204,13 +204,14 @@ def api_status():
 @app.route('/api/test/<symbol>')
 def api_test(symbol):
     """Test a single stock fetch — shows raw data returned."""
-    from data_connector import StockConnector
-    sc = StockConnector()
-    data = sc.fetch(symbol.upper())
-    if data:
-        return jsonify({'status': 'ok', 'data': data})
-    return jsonify({'status': 'failed', 'symbol': symbol.upper(),
-                    'message': 'No data returned from yfinance or Alpha Vantage'})
+    try:
+        data = connector.stocks.fetch(symbol.upper())
+        if data:
+            return jsonify({'status': 'success', 'data': data}), 200
+        else:
+            return jsonify({'status': 'error', 'message': 'No data found'}), 404
+    except Exception as e:
+        return jsonify({'status': 'error', 'message': str(e)}), 500
     """Modify stop-loss / take-profit on an open position."""
     from flask import request
     data = request.get_json()
