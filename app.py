@@ -201,15 +201,15 @@ def api_status():
     })
 
 
-@app.route('/api/test/<symbol>')
-def api_test(symbol):
-    """Test a single stock fetch — shows raw data returned."""
+@app.route('/api/test/<ticker>')
+def test_ticker(ticker):
+    """Returns raw price data for a specific ticker to confirm connectivity."""
     try:
-        data = connector.stocks.fetch(symbol.upper())
+        data = connector.stocks.fetch(ticker.upper())
         if data:
-            return jsonify({'status': 'success', 'data': data}), 200
+            return jsonify({'status': 'success', 'ticker': ticker.upper(), 'data': data}), 200
         else:
-            return jsonify({'status': 'error', 'message': 'No data found'}), 404
+            return jsonify({'status': 'error', 'message': f'No data found for {ticker}'}), 404
     except Exception as e:
         return jsonify({'status': 'error', 'message': str(e)}), 500
     """Modify stop-loss / take-profit on an open position."""

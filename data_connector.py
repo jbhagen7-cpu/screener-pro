@@ -44,6 +44,11 @@ class StockConnector:
         self.strategy    = getattr(cfg, 'DATA_STRATEGY', 'yfinance_first')
         self._av_calls   = 0
         self._av_reset   = time.time()
+        # Browser session to bypass Yahoo Finance bot detection
+        self.session = requests.Session()
+        self.session.headers.update({
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
+        })
 
     # ── Rate limiter for Alpha Vantage (5 calls/min free tier) ──────────────
     def _av_rate_limit(self):
@@ -64,38 +69,44 @@ class StockConnector:
         try:
             import yfinance as yf
 
-            # Use download which is more reliable than Ticker.info on servers
-            hist = yf.download(
+            # Use browser session to bypass Yahoo Finance bot detection
+            df = yf.download(
                 symbol,
                 period='60d',
                 interval='1d',
+                session=self.session,
                 progress=False,
                 auto_adjust=True,
             )
 
-            if hist is None or len(hist) < 5:
+            if df is None or df.empty or len(df) < 5:
                 return None
 
-            # Flatten MultiIndex columns if present
-            if hasattr(hist.columns, 'levels'):
-                hist.columns = hist.columns.get_level_values(0)
-
-            closes  = list(hist['Close'].dropna())
-            volumes = list(hist['Volume'].dropna())
-            highs   = list(hist['High'].dropna())
-            lows    = list(hist['Low'].dropna())
+            # 2026 Fix: handle MultiIndex columns
+            if isinstance(df.columns, __import__('pandas').MultiIndex):
+                closes  = list(df['Close'][symbol].dropna())
+                volumes = list(df['Volume'][symbol].dropna())
+                highs   = list(df['High'][symbol].dropna())
+                lows    = list(df['Low'][symbol].dropna())
+                opens   = list(df['Open'][symbol].dropna())
+            else:
+                closes  = list(df['Close'].dropna())
+                volumes = list(df['Volume'].dropna())
+                highs   = list(df['High'].dropna())
+                lows    = list(df['Low'].dropna())
+                opens   = list(df['Open'].dropna())
 
             if len(closes) < 5:
                 return None
 
             price      = float(closes[-1])
-            prev_close = float(closes[-2]) if len(closes) > 1 else price
+            prev_close = float(closes[-2])
+            open_price = float(opens[-1]) if opens else price
 
             if price <= 0:
                 return None
 
-            change_pct = ((price - prev_close) / prev_close) * 100 if prev_close else 0
-
+            change_pct = ((price - prev_close) / prev_close) * 100
             today_vol  = float(volumes[-1]) if volumes else 0
             avg_vol_20 = sum(float(v) for v in volumes[-20:]) / min(20, len(volumes))
             rvol       = today_vol / avg_vol_20 if avg_vol_20 > 0 else 1.0
@@ -125,29 +136,14 @@ class StockConnector:
             losses = [-d for d in deltas if d < 0]
             avg_g  = sum(gains)  / 14 if gains  else 0
             avg_l  = sum(losses) / 14 if losses else 0.001
-            rs     = avg_g / avg_l
-            rsi    = 100 - (100 / (1 + rs))
+            rsi    = 100 - (100 / (1 + avg_g / avg_l))
 
-            # ADX
-            adx = self._calc_adx(highs, lows, closes)
-
-            high_52w = max(float(h) for h in highs[-252:]) if len(highs) >= 252 else max(float(h) for h in highs)
-            low_52w  = min(float(l) for l in lows[-252:])  if len(lows)  >= 252 else min(float(l) for l in lows)
-            high_20d = max(float(h) for h in highs[-20:])  if len(highs) >= 20  else max(float(h) for h in highs)
-
-            # Try to get open price for gap calc
-            open_price = float(hist['Open'].iloc[-1]) if 'Open' in hist.columns else price
-            gap_pct    = ((open_price - prev_close) / prev_close) * 100 if prev_close else 0
+            adx      = self._calc_adx(highs, lows, closes)
+            high_52w = max(float(h) for h in (highs[-252:] if len(highs) >= 252 else highs))
+            low_52w  = min(float(l) for l in (lows[-252:]  if len(lows)  >= 252 else lows))
+            high_20d = max(float(h) for h in (highs[-20:]  if len(highs) >= 20  else highs))
+            gap_pct  = ((open_price - prev_close) / prev_close) * 100
             dollar_vol = price * today_vol
-
-            # Get name from Ticker info (best effort)
-            name = symbol
-            try:
-                tk = yf.Ticker(symbol)
-                info = tk.fast_info
-                name = getattr(info, 'company_name', symbol) or symbol
-            except Exception:
-                pass
 
             return {
                 'symbol':        symbol,
@@ -169,7 +165,7 @@ class StockConnector:
                 'low_52w':       round(low_52w, 4),
                 'high_20d':      round(high_20d, 4),
                 'market_cap':    0,
-                'name':          name,
+                'name':          symbol,
                 'sector':        '',
                 'has_earnings':  False,
                 'source':        'yfinance',
