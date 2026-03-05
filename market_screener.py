@@ -274,24 +274,17 @@ def score_crypto_liquidity(data: dict) -> float:
 # =============================================================================
 
 def score_stock(data: dict) -> dict:
-    """Calculate all 10 signals + composite score for a stock."""
+    """Calculate 5 signals + composite score for a stock."""
     signals = {
         'rvol':      score_rvol(data),
         'momentum':  score_momentum(data),
         'vwap':      score_vwap(data),
         'breakout':  score_breakout(data),
         'atr':       score_atr(data),
-        'rsi':       score_rsi(data),
-        'adx':       score_adx(data),
-        'gap':       score_gap(data),
-        'liquidity': score_liquidity(data),
-        'catalyst':  score_catalyst(data),
     }
 
-    # Weighted composite (0–100 scale)
-    composite = sum(signals[k] * SW.get(k, 0.1) for k in signals) * 10
+    composite = sum(signals[k] * SW.get(k, 0.2) for k in signals) * 10
 
-    # Signal label
     if   composite >= 80: signal = 'Strong Buy'
     elif composite >= 65: signal = 'Buy'
     elif composite >= 45: signal = 'Neutral'

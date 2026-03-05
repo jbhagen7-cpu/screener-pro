@@ -41,16 +41,11 @@ CRYPTO_MIN_VOLUME_24H = 100_000  # Minimum 24h crypto volume in USD
 # =============================================================================
 
 STOCK_SIGNAL_WEIGHTS = {
-    "rvol":       0.15,   # Relative Volume
-    "momentum":   0.14,   # % Price Change + Multi-Timeframe Trend
-    "vwap":       0.13,   # VWAP Position / Reclaim
-    "breakout":   0.12,   # Breakout Above Resistance (HOD / Range Break)
-    "atr":        0.11,   # ATR Expansion (Volatility Spike)
-    "rsi":        0.10,   # RSI (Relative Strength Index)
-    "adx":        0.09,   # ADX (Trend Strength)
-    "gap":        0.08,   # Gap Strength (Premarket vs Prior Close)
-    "liquidity":  0.05,   # Liquidity Filter (Spread + Dollar Volume)
-    "catalyst":   0.03,   # News / Catalyst Presence
+    "rvol":      0.30,   # Relative Volume
+    "momentum":  0.25,   # % Price Change + Multi-Timeframe Trend
+    "vwap":      0.20,   # VWAP Position / Reclaim
+    "breakout":  0.15,   # Breakout Above Resistance (HOD / Range Break)
+    "atr":       0.10,   # ATR Expansion (Volatility Spike)
 }
 
 assert abs(sum(STOCK_SIGNAL_WEIGHTS.values()) - 1.0) < 1e-9, \

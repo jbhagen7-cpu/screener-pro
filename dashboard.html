@@ -469,11 +469,11 @@ let autoTimer = null;
 
 // ── Demo data (simulated with realistic signals) ──
 const DEMO_STOCKS = [
-  { rank:1, symbol:"PLUG",  name:"Plug Power Inc",       price:3.18,  change:+8.4,  score:82, rvol:9.2, momentum:8.8, vwap:8.5, breakout:8.1, atr:8.7, rsi:7.2, adx:6.8, gap:7.5, liquidity:6.0, catalyst:5.0 },
-  { rank:2, symbol:"SNDL",  name:"SNDL Inc",             price:1.44,  change:+6.1,  score:76, rvol:8.7, momentum:7.9, vwap:7.3, breakout:7.8, atr:8.2, rsi:6.9, adx:6.1, gap:5.5, liquidity:5.5, catalyst:4.0 },
-  { rank:3, symbol:"FCEL",  name:"FuelCell Energy",      price:2.87,  change:+4.9,  score:71, rvol:7.5, momentum:7.2, vwap:6.8, breakout:7.1, atr:7.4, rsi:7.5, adx:6.5, gap:4.2, liquidity:5.0, catalyst:6.0 },
-  { rank:4, symbol:"BLNK",  name:"Blink Charging Co",   price:4.62,  change:+3.3,  score:64, rvol:6.8, momentum:6.4, vwap:6.2, breakout:6.5, atr:6.1, rsi:6.8, adx:5.8, gap:3.8, liquidity:6.5, catalyst:3.0 },
-  { rank:5, symbol:"GEVO",  name:"Gevo Inc",             price:1.93,  change:+2.1,  score:58, rvol:5.9, momentum:5.8, vwap:5.5, breakout:5.9, atr:5.7, rsi:6.2, adx:5.2, gap:3.1, liquidity:5.8, catalyst:2.0 },
+  { rank:1, symbol:"PLUG",  name:"Plug Power Inc",       price:3.18,  change:+8.4,  score:82, high_52w:6.42, low_52w:1.89, rvol:9.2, momentum:8.8, vwap:8.5, breakout:8.1, atr:8.7 },
+  { rank:2, symbol:"SNDL",  name:"SNDL Inc",             price:1.44,  change:+6.1,  score:76, high_52w:2.98, low_52w:0.81, rvol:8.7, momentum:7.9, vwap:7.3, breakout:7.8, atr:8.2 },
+  { rank:3, symbol:"FCEL",  name:"FuelCell Energy",      price:2.87,  change:+4.9,  score:71, high_52w:4.11, low_52w:1.54, rvol:7.5, momentum:7.2, vwap:6.8, breakout:7.1, atr:7.4 },
+  { rank:4, symbol:"BLNK",  name:"Blink Charging Co",   price:4.62,  change:+3.3,  score:64, high_52w:8.90, low_52w:2.14, rvol:6.8, momentum:6.4, vwap:6.2, breakout:6.5, atr:6.1 },
+  { rank:5, symbol:"GEVO",  name:"Gevo Inc",             price:1.93,  change:+2.1,  score:58, high_52w:3.22, low_52w:0.97, rvol:5.9, momentum:5.8, vwap:5.5, breakout:5.9, atr:5.7 },
 ];
 
 const DEMO_CRYPTOS = [
@@ -526,11 +526,6 @@ function buildRow(item, type, idx) {
         { name:'VWAP',     val: item.vwap },
         { name:'Breakout', val: item.breakout },
         { name:'ATR',      val: item.atr },
-        { name:'RSI',      val: item.rsi },
-        { name:'ADX',      val: item.adx },
-        { name:'Gap',      val: item.gap },
-        { name:'Liquidity',val: item.liquidity },
-        { name:'Catalyst', val: item.catalyst },
       ]
     : [
         { name:'Vol Spike',val: item.volume_spike },
@@ -547,6 +542,23 @@ function buildRow(item, type, idx) {
       <div class="sig-val">${s.val.toFixed(1)}/10</div>
     </div>`).join('');
 
+  // 52w high/low for stocks
+  const weekHighLow = isStock && item.high_52w && item.low_52w ? `
+    <div style="display:flex;gap:16px;margin-top:12px;padding-top:12px;border-top:1px solid var(--border)">
+      <div>
+        <div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:0.4px;margin-bottom:3px">52W High</div>
+        <div style="font-family:var(--mono);font-size:13px;font-weight:600;color:var(--green)">$${parseFloat(item.high_52w).toFixed(2)}</div>
+      </div>
+      <div>
+        <div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:0.4px;margin-bottom:3px">52W Low</div>
+        <div style="font-family:var(--mono);font-size:13px;font-weight:600;color:var(--red)">$${parseFloat(item.low_52w).toFixed(2)}</div>
+      </div>
+      <div>
+        <div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:0.4px;margin-bottom:3px">Current vs Range</div>
+        <div style="font-family:var(--mono);font-size:13px;font-weight:600;color:var(--accent)">${(((item.price - item.low_52w) / (item.high_52w - item.low_52w)) * 100).toFixed(0)}% of range</div>
+      </div>
+    </div>` : '';
+
   const rowId = type + '-row-' + idx;
   const bdId  = type + '-bd-' + idx;
 
@@ -559,6 +571,7 @@ function buildRow(item, type, idx) {
       </div>
       <div class="price-cell td-right">
         <div class="price-val">${fmtPrice(item.price)}</div>
+        ${isStock && item.high_52w ? `<div class="price-sub">52W: $${parseFloat(item.low_52w).toFixed(2)}–$${parseFloat(item.high_52w).toFixed(2)}</div>` : ''}
       </div>
       <div class="change-cell td-right">
         <div class="change-badge ${chgCls}">${arrow} ${fmtChange(item.change)}</div>
@@ -580,6 +593,7 @@ function buildRow(item, type, idx) {
     </div>
     <div class="signal-breakdown" id="${bdId}">
       <div class="signals-grid">${sigHtml}</div>
+      ${weekHighLow}
     </div>`;
 }
 
