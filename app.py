@@ -201,8 +201,35 @@ def api_status():
     })
 
 
-@app.route('/api/test/<ticker>')
-def test_ticker(ticker):
+@app.route('/api/debug/<ticker>')
+def debug_ticker(ticker):
+    """Shows exactly what each data source returns."""
+    from data_connector import StockConnector
+    sc = StockConnector()
+    results = {}
+
+    # Test Alpha Vantage
+    try:
+        av = sc.fetch_alpha_vantage(ticker.upper())
+        results['alpha_vantage'] = av if av else 'no data'
+    except Exception as e:
+        results['alpha_vantage'] = f'error: {str(e)}'
+
+    # Test Yahoo Direct HTTP
+    try:
+        yd = sc.fetch_yahoo_direct(ticker.upper())
+        results['yahoo_direct'] = yd if yd else 'no data'
+    except Exception as e:
+        results['yahoo_direct'] = f'error: {str(e)}'
+
+    # Test yfinance library
+    try:
+        yf = sc.fetch_yfinance(ticker.upper())
+        results['yfinance'] = yf if yf else 'no data'
+    except Exception as e:
+        results['yfinance'] = f'error: {str(e)}'
+
+    return jsonify(results)
     """Returns raw price data for a specific ticker to confirm connectivity."""
     try:
         data = connector.stocks.fetch(ticker.upper())
