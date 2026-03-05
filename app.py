@@ -201,8 +201,16 @@ def api_status():
     })
 
 
-@app.route('/api/modify_position', methods=['POST'])
-def api_modify_position():
+@app.route('/api/test/<symbol>')
+def api_test(symbol):
+    """Test a single stock fetch — shows raw data returned."""
+    from data_connector import StockConnector
+    sc = StockConnector()
+    data = sc.fetch(symbol.upper())
+    if data:
+        return jsonify({'status': 'ok', 'data': data})
+    return jsonify({'status': 'failed', 'symbol': symbol.upper(),
+                    'message': 'No data returned from yfinance or Alpha Vantage'})
     """Modify stop-loss / take-profit on an open position."""
     from flask import request
     data = request.get_json()
