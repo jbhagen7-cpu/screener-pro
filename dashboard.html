@@ -75,32 +75,19 @@ header {
 
 .header-right { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
 
-/* live toggle */
-.live-toggle {
+/* live pill */
+.status-pill {
   display: flex; align-items: center; gap: 8px;
-  background: var(--surface); border: 1.5px solid var(--border2);
-  border-radius: 20px; padding: 5px 5px 5px 12px;
-  cursor: pointer; user-select: none;
-  font-size: 12px; font-weight: 500;
-  transition: all 0.2s;
+  background: var(--green-bg);
+  border: 1px solid #b8edda;
+  border-radius: 20px; padding: 6px 14px;
+  font-size: 12px; color: var(--green); font-weight: 600;
 }
-.live-toggle:hover { border-color: var(--accent); }
-.live-toggle.live { border-color: var(--green); background: var(--green-bg); color: var(--green); }
-.toggle-pill {
-  width: 36px; height: 22px; border-radius: 11px;
-  background: var(--border); position: relative;
-  transition: background 0.2s;
+.status-dot {
+  width: 7px; height: 7px; border-radius: 50%;
+  background: var(--green);
+  animation: blink 2s infinite;
 }
-.live-toggle.live .toggle-pill { background: var(--green); }
-.toggle-pill::after {
-  content: ''; position: absolute;
-  top: 3px; left: 3px;
-  width: 16px; height: 16px; border-radius: 50%;
-  background: white;
-  transition: transform 0.2s;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.2);
-}
-.live-toggle.live .toggle-pill::after { transform: translateX(14px); }
 
 /* refresh button */
 .btn-refresh {
@@ -380,10 +367,7 @@ header {
       <button class="btn-refresh" id="refresh-btn" onclick="refresh()">
         <span class="refresh-icon">↻</span> Refresh
       </button>
-      <div class="live-toggle" id="live-toggle" onclick="toggleLive()">
-        DEMO
-        <div class="toggle-pill"></div>
-      </div>
+      <div class="status-pill"><div class="status-dot"></div> LIVE</div>
     </div>
   </header>
 
@@ -403,11 +387,7 @@ header {
     <div class="market-stat"><span>Screened</span> <strong id="scanned-count">—</strong></div>
   </div>
 
-  <!-- Demo banner -->
-  <div class="demo-banner" id="demo-banner">
-    ⚡ Demo mode — showing simulated data. Toggle <strong>LIVE</strong> to connect to real market data via Python backend.
-  </div>
-  <div class="live-banner" id="live-banner">
+  <div class="live-banner show" id="live-banner">
     <span>●</span> Live data — pulling from Yahoo Finance + CoinGecko. Last scan: <span id="live-scan-time">—</span>
   </div>
 
@@ -463,9 +443,264 @@ header {
 </div>
 
 <script>
-// ── State ──
-let isLive = false;
+const API = 'https://screener-pro-56im.onrender.com';
 let autoTimer = null;
+
+// ── Helpers ──
+function fmtPrice(p) {
+  return p < 1 ? '$' + parseFloat(p).toFixed(4) : '$' + parseFloat(p).toFixed(2);
+}
+function fmtChange(c) {
+  const sign = c >= 0 ? '+' : '';
+  return sign + parseFloat(c).toFixed(2) + '%';
+}
+function signalLabel(score) {
+  if (score >= 80) return { cls: 'strong-buy', txt: 'Strong Buy' };
+  if (score >= 65) return { cls: 'buy',        txt: 'Buy' };
+  if (score >= 45) return { cls: 'neutral',    txt: 'Neutral' };
+  return               { cls: 'sell',          txt: 'Weak' };
+}
+function scoreClass(score) {
+  if (score >= 70) return 'high';
+  if (score >= 45) return 'medium';
+  return 'low';
+}
+function scoreColor(val) {
+  if (val >= 7) return '#0db07d';
+  if (val >= 4.5) return '#e8960a';
+  return '#e8364a';
+}
+
+// ── Build a row ──
+function buildRow(item, type, idx) {
+  const isStock = type === 'stock';
+  const sig = signalLabel(item.score);
+  const change = item.change_pct || item.change_24h || 0;
+  const chgCls = change > 0.5 ? 'up' : change < -0.5 ? 'down' : 'flat';
+  const arrow  = change > 0.5 ? '▲' : change < -0.5 ? '▼' : '—';
+
+  const sigs = item.signals || {};
+  const signals = isStock
+    ? [
+        { name:'RVOL',     val: sigs.rvol     || 0 },
+        { name:'Momentum', val: sigs.momentum  || 0 },
+        { name:'VWAP',     val: sigs.vwap      || 0 },
+        { name:'Breakout', val: sigs.breakout  || 0 },
+        { name:'ATR',      val: sigs.atr       || 0 },
+      ]
+    : [
+        { name:'Vol Spike', val: sigs.volume_spike || 0 },
+        { name:'Momentum',  val: sigs.momentum     || 0 },
+        { name:'Breakout',  val: sigs.breakout     || 0 },
+        { name:'Volatility',val: sigs.volatility   || 0 },
+        { name:'Liquidity', val: sigs.liquidity    || 0 },
+      ];
+
+  const sigHtml = signals.map(s => `
+    <div class="sig-item">
+      <div class="sig-name">${s.name}</div>
+      <div class="sig-track"><div class="sig-bar" style="width:${(s.val/10)*100}%;background:${scoreColor(s.val)}"></div></div>
+      <div class="sig-val">${parseFloat(s.val).toFixed(1)}/10</div>
+    </div>`).join('');
+
+  const weekHighLow = isStock && item.high_52w && item.low_52w ? `
+    <div style="display:flex;gap:16px;margin-top:12px;padding-top:12px;border-top:1px solid var(--border)">
+      <div>
+        <div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:0.4px;margin-bottom:3px">52W High</div>
+        <div style="font-family:var(--mono);font-size:13px;font-weight:600;color:var(--green)">$${parseFloat(item.high_52w).toFixed(2)}</div>
+      </div>
+      <div>
+        <div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:0.4px;margin-bottom:3px">52W Low</div>
+        <div style="font-family:var(--mono);font-size:13px;font-weight:600;color:var(--red)">$${parseFloat(item.low_52w).toFixed(2)}</div>
+      </div>
+      <div>
+        <div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:0.4px;margin-bottom:3px">In Range</div>
+        <div style="font-family:var(--mono);font-size:13px;font-weight:600;color:var(--accent)">${(((item.price - item.low_52w) / (item.high_52w - item.low_52w)) * 100).toFixed(0)}%</div>
+      </div>
+    </div>` : '';
+
+  const rowId = type + '-row-' + idx;
+  const bdId  = type + '-bd-'  + idx;
+
+  return `
+    <div class="ticker-row" id="${rowId}" onclick="toggleBreakdown('${bdId}')">
+      <div class="rank ${item.rank <= 2 ? 'top' : ''}">${item.rank}</div>
+      <div class="ticker-info">
+        <div class="ticker-symbol">${item.symbol}</div>
+        <div class="ticker-name">${item.name || item.symbol}</div>
+      </div>
+      <div class="price-cell td-right">
+        <div class="price-val">${fmtPrice(item.price)}</div>
+        ${isStock && item.high_52w ? `<div class="price-sub">52W: $${parseFloat(item.low_52w).toFixed(2)}–$${parseFloat(item.high_52w).toFixed(2)}</div>` : ''}
+      </div>
+      <div class="change-cell td-right">
+        <div class="change-badge ${chgCls}">${arrow} ${fmtChange(change)}</div>
+      </div>
+      <div class="score-cell">
+        <div class="score-label">
+          <span>Score</span>
+          <strong>${item.score}</strong>
+        </div>
+        <div class="score-track">
+          <div class="score-fill ${scoreClass(item.score)}" style="width:${item.score}%"></div>
+        </div>
+      </div>
+      <div class="signal-cell">
+        <div class="signal-badge ${sig.cls}">
+          <div class="sig-dot"></div>${sig.txt}
+        </div>
+      </div>
+    </div>
+    <div class="signal-breakdown" id="${bdId}">
+      <div class="signals-grid">${sigHtml}</div>
+      ${weekHighLow}
+    </div>`;
+}
+
+function toggleBreakdown(id) {
+  document.getElementById(id).classList.toggle('open');
+}
+
+// ── Skeleton loader ──
+function showSkeleton() {
+  const skRow = () => `
+    <div class="ticker-row" style="pointer-events:none">
+      <div class="rank"><div class="skeleton" style="width:14px;height:14px"></div></div>
+      <div class="ticker-info">
+        <div class="skeleton" style="width:50px;height:14px;margin-bottom:4px"></div>
+        <div class="skeleton" style="width:100px;height:10px"></div>
+      </div>
+      <div class="price-cell"><div class="skeleton" style="width:50px;height:14px;margin-left:auto"></div></div>
+      <div class="change-cell"><div class="skeleton" style="width:60px;height:22px;border-radius:6px;margin-left:auto"></div></div>
+      <div class="score-cell"><div class="skeleton" style="width:100%;height:5px;margin-top:10px"></div></div>
+      <div class="signal-cell"><div class="skeleton" style="width:70px;height:24px;border-radius:7px;margin-left:auto"></div></div>
+    </div>`;
+  const rows = Array(5).fill(0).map(skRow).join('');
+  document.getElementById('stock-rows').innerHTML  = rows;
+  document.getElementById('crypto-rows').innerHTML = rows;
+}
+
+// ── Render tables ──
+function renderData(stocks, cryptos, meta) {
+  document.getElementById('stock-rows').innerHTML  = stocks.map((s,i) => buildRow(s, 'stock',  i)).join('');
+  document.getElementById('crypto-rows').innerHTML = cryptos.map((c,i) => buildRow(c, 'crypto', i)).join('');
+
+  const now = new Date();
+  document.getElementById('last-updated').textContent =
+    'Last updated: ' + now.toLocaleTimeString('en-US', {hour:'2-digit', minute:'2-digit', second:'2-digit'});
+
+  const total = (meta && meta.total_scanned)
+    ? (meta.total_scanned.stocks || 0) + (meta.total_scanned.cryptos || 0)
+    : stocks.length + cryptos.length;
+  document.getElementById('scanned-count').textContent = total + ' assets scanned';
+  document.getElementById('stock-meta').textContent  = 'Top ' + stocks.length  + ' of ' + ((meta && meta.total_scanned && meta.total_scanned.stocks)  || '—') + ' scanned · composite score';
+  document.getElementById('crypto-meta').textContent = 'Top ' + cryptos.length + ' of ' + ((meta && meta.total_scanned && meta.total_scanned.cryptos) || '—') + ' scanned · composite score';
+}
+
+// ── Show scanning message ──
+function showScanning() {
+  const msg = `<div style="padding:24px;text-align:center;color:var(--muted);font-size:13px">
+    <div style="margin-bottom:8px;font-size:20px">⏳</div>
+    Scanning market data… check back in ~60 seconds
+  </div>`;
+  document.getElementById('stock-rows').innerHTML  = msg;
+  document.getElementById('crypto-rows').innerHTML = msg;
+}
+
+// ── Show error ──
+function showError(msg) {
+  const html = `<div style="padding:24px;text-align:center;color:var(--red);font-size:13px">
+    <div style="margin-bottom:8px;font-size:20px">⚠️</div>${msg}
+  </div>`;
+  document.getElementById('stock-rows').innerHTML  = html;
+  document.getElementById('crypto-rows').innerHTML = html;
+}
+
+// ── Fetch live data ──
+async function fetchData() {
+  const btn = document.getElementById('refresh-btn');
+  btn.classList.add('spinning');
+  showSkeleton();
+
+  try {
+    const res = await fetch(API + '/api/screening_results.json');
+    if (!res.ok) throw new Error('Server error ' + res.status);
+    const data = await res.json();
+
+    if (!data.stocks || data.stocks.length === 0) {
+      // Trigger a scan if no results yet
+      await fetch(API + '/api/scan_now');
+      showScanning();
+      // Retry after 90 seconds
+      setTimeout(fetchData, 90000);
+      return;
+    }
+
+    renderData(data.stocks, data.cryptos, data);
+    document.getElementById('live-scan-time').textContent =
+      new Date().toLocaleTimeString();
+
+  } catch(e) {
+    console.error('Fetch failed:', e);
+    showError('Could not reach server. Retrying in 30s…');
+    setTimeout(fetchData, 30000);
+  } finally {
+    btn.classList.remove('spinning');
+  }
+}
+
+// ── Refresh button ──
+async function refresh() {
+  await fetchData();
+}
+
+// ── Market status ──
+function updateMarketStatus() {
+  const now = new Date();
+  const et  = new Date(now.toLocaleString('en-US', {timeZone:'America/New_York'}));
+  const h = et.getHours(), m = et.getMinutes(), day = et.getDay();
+  const dot    = document.getElementById('market-dot');
+  const status = document.getElementById('market-status');
+  const mins   = h * 60 + m;
+  const isWeekday = day >= 1 && day <= 5;
+
+  if (isWeekday && mins >= 9*60+30 && mins < 16*60) {
+    dot.className = 'dot open';
+    status.innerHTML = '<strong>Market Open</strong>';
+  } else if (isWeekday && mins >= 4*60 && mins < 9*60+30) {
+    dot.className = 'dot closed';
+    status.innerHTML = 'Pre-Market';
+  } else if (isWeekday && mins >= 16*60 && mins < 20*60) {
+    dot.className = 'dot closed';
+    status.innerHTML = 'After-Hours';
+  } else {
+    dot.className = 'dot closed';
+    status.innerHTML = 'Market Closed';
+  }
+}
+
+// ── Init ──
+function init() {
+  // Date
+  const d = new Date();
+  document.getElementById('today-date').textContent =
+    d.toLocaleDateString('en-US', {weekday:'short', month:'short', day:'numeric', year:'numeric'});
+
+  updateMarketStatus();
+  setInterval(updateMarketStatus, 60000);
+
+  // Always live — fetch immediately
+  fetchData();
+
+  // Auto-refresh every 5 minutes
+  if (autoTimer) clearInterval(autoTimer);
+  autoTimer = setInterval(fetchData, 5 * 60 * 1000);
+}
+
+init();
+</script>
+</body>
+</html>
 
 // ── Demo data (simulated with realistic signals) ──
 const DEMO_STOCKS = [
